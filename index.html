@@ -1,0 +1,2260 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CBMan</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0B2545">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+  :root{
+    --navy:#0B2545;
+    --navy-2:#13315C;
+    --gold:#C7962C;
+    --gold-2:#E4B851;
+    --paper:#F6F3EC;
+    --ink:#1B2430;
+    --ok:#1E6B3A;
+    --ok-bg:#E7F5EC;
+    --err:#B23A2E;
+    --err-bg:#FBEBE9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #16386b 0%, var(--navy) 55%, var(--navy-2) 100%);
+    font-family:"Segoe UI", Arial, sans-serif;
+    color:var(--ink);
+    display:flex;
+    justify-content:center;
+    padding:28px 16px 60px;
+  }
+  .card{
+    width:100%;
+    max-width:440px;
+    background:var(--paper);
+    border-radius:14px;
+    box-shadow:0 18px 40px rgba(0,0,0,0.35);
+    overflow:hidden;
+    border:1px solid rgba(199,150,44,0.4);
+  }
+  .header{
+    background:linear-gradient(135deg,var(--navy),var(--navy-2));
+    padding:22px 20px 18px;
+    text-align:center;
+    position:relative;
+  }
+  .header::after{
+    content:"";
+    position:absolute;
+    left:20px; right:20px; bottom:0;
+    height:3px;
+    background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  }
+  .header .eyebrow{
+    color:var(--gold-2);
+    letter-spacing:2px;
+    font-size:11px;
+    text-transform:uppercase;
+    margin-bottom:6px;
+  }
+  .header h1{
+    color:#fff;
+    font-size:18px;
+    margin:0;
+    font-weight:700;
+    letter-spacing:0.4px;
+  }
+  .body{
+    padding:22px 22px 24px;
+  }
+  label{
+    display:block;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--navy-2);
+    margin:14px 0 6px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+  }
+  input[type=text], input[type=password]{
+    width:100%;
+    padding:12px 12px;
+    font-size:16px;
+    text-align:center;
+    letter-spacing:1px;
+    border:1.5px solid #C9C2AE;
+    border-radius:8px;
+    background:#fff;
+    color:var(--ink);
+    outline:none;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  select{
+    width:100%;
+    padding:12px 12px;
+    font-size:14.5px;
+    border:1.5px solid #C9C2AE;
+    border-radius:8px;
+    background:#fff;
+    color:var(--ink);
+    outline:none;
+    transition:border-color .15s, box-shadow .15s;
+    -webkit-appearance:none;
+    appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2313315C'><path d='M7 10l5 5 5-5z'/></svg>");
+    background-repeat:no-repeat;
+    background-position:right 10px center;
+    background-size:20px;
+  }
+  select:focus{
+    border-color:var(--gold);
+    box-shadow:0 0 0 3px rgba(199,150,44,0.25);
+  }
+  input[type=text][readonly]{ background:#F0EDE4; color:#8a8271; }
+  input:focus{
+    border-color:var(--gold);
+    box-shadow:0 0 0 3px rgba(199,150,44,0.25);
+  }
+  .row2{display:flex; gap:10px;}
+  .row2 > div{flex:1;}
+  .hint{
+    font-size:11px;
+    color:#7a7263;
+    margin-top:4px;
+    text-align:center;
+  }
+  .toggle-group{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:6px;}
+  .toggle-btn{
+    flex:1;
+    padding:11px 8px;
+    font-size:13px;
+    font-weight:600;
+    text-align:center;
+    border:1.5px solid #C9C2AE;
+    border-radius:8px;
+    background:#fff;
+    color:var(--navy-2);
+    cursor:pointer;
+    user-select:none;
+    transition:all .15s;
+  }
+  .toggle-btn.active{
+    background:linear-gradient(135deg,var(--gold-2),var(--gold));
+    border-color:var(--gold);
+    color:var(--navy);
+  }
+  .buttons{display:flex; gap:10px; margin-top:20px;}
+  button.action{
+    flex:1;
+    padding:13px 10px;
+    font-size:14.5px;
+    font-weight:700;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    letter-spacing:0.5px;
+    transition:transform .08s, filter .15s;
+  }
+  button.action:active{transform:scale(0.97);}
+  .btn-gold{
+    background:linear-gradient(135deg,var(--gold-2),var(--gold));
+    color:var(--navy);
+  }
+  .btn-gold:hover{filter:brightness(1.05);}
+  .btn-outline{
+    background:transparent;
+    color:var(--navy-2);
+    border:1.5px solid var(--navy-2);
+  }
+  .btn-outline:hover{background:rgba(11,37,69,0.06);}
+  .result{
+    margin-top:20px;
+    background:#fff;
+    border:1.5px solid #E1DACB;
+    border-radius:10px;
+    padding:16px;
+    min-height:100px;
+    font-size:14px;
+    line-height:1.7;
+    white-space:pre-line;
+    color:var(--navy-2);
+    transition:opacity .35s;
+  }
+  .result.empty::before{
+    content:"Le résultat s'affichera ici.";
+    color:#9a9285;
+    font-style:italic;
+    font-weight:400;
+  }
+  .result.ok{ }
+  .result.epuise{ }
+  .status-ok{ color:var(--ok); font-weight:700; }
+  .status-epuise{ color:var(--err); font-weight:700; }
+  .mode-section{display:none;}
+  .mode-section.active{display:block;}
+  .result-simple{
+    margin-top:22px; background:#fff; border:1.5px solid #E1DACB; border-radius:10px;
+    padding:18px; text-align:center;
+  }
+  .result-simple .lbl{font-size:11px; letter-spacing:1px; color:var(--gold); font-weight:700; text-transform:uppercase;}
+  .result-simple .val{font-size:38px; font-weight:800; color:var(--navy); margin-top:6px;}
+  .result-simple .sub{font-size:12.5px; color:#8a8271; margin-top:8px;}
+  .result .section-title{
+    display:block;
+    font-size:11px;
+    letter-spacing:1px;
+    font-weight:700;
+    text-transform:uppercase;
+    margin-bottom:2px;
+    opacity:0.75;
+    color:var(--gold);
+  }
+  .result.ok .section-title, .result.epuise .section-title{ color: var(--gold); }
+  .result .section-title.second{margin-top:12px;}
+  .error-msg{
+    color:var(--err);
+    font-size:13px;
+    text-align:center;
+    margin-top:10px;
+    min-height:16px;
+    font-weight:600;
+  }
+  .screen{display:none;}
+  .screen.active{display:block;}
+
+  /* ----- Ecran menu ----- */
+  .menu-item{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    width:100%;
+    text-align:left;
+    padding:16px;
+    margin-bottom:12px;
+    background:#fff;
+    border:1.5px solid #E1DACB;
+    border-radius:10px;
+    cursor:pointer;
+    transition:all .15s;
+  }
+  .menu-item:hover{border-color:var(--gold); box-shadow:0 4px 12px rgba(199,150,44,0.15);}
+  .menu-item .icon{
+    width:40px;
+    height:40px;
+    border-radius:10px;
+    background:linear-gradient(135deg,var(--navy),var(--navy-2));
+    color:var(--gold-2);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+    font-size:16px;
+    flex-shrink:0;
+  }
+  .menu-item .txt b{display:block; font-size:14.5px; color:var(--navy);}
+  .menu-item .txt span{font-size:12px; color:#8a8271;}
+
+  .back-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:none;
+    border:none;
+    color:var(--navy-2);
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    padding:4px 0;
+    margin-bottom:6px;
+  }
+  .back-btn:hover{color:var(--gold);}
+
+  /* ----- Grilles Indiciaires / Code Localité (ajout) ----- */
+  .gl-search{
+    display:flex; align-items:center; gap:8px;
+    background:#fff; border:1.5px solid #C9C2AE; border-radius:8px;
+    padding:10px 12px; margin:6px 0 12px;
+  }
+  .gl-search:focus-within{border-color:var(--gold); box-shadow:0 0 0 3px rgba(199,150,44,0.25);}
+  .gl-search svg{flex-shrink:0; color:#8a8271;}
+  .gl-search input{all:unset; flex:1; font-size:15px; color:var(--ink);}
+  .gl-search .gl-clear{all:unset; cursor:pointer; color:#8a8271; font-size:12.5px; display:none;}
+
+  .gl-select{
+    width:100%; margin-bottom:10px;
+    padding:11px 12px; font-size:13.5px;
+    border:1.5px solid #C9C2AE; border-radius:8px; background:#fff; color:var(--ink);
+  }
+
+  .gl-hero{
+    display:none; background:linear-gradient(135deg,var(--navy),var(--navy-2));
+    color:#fff; border-radius:10px; padding:16px 18px; margin-bottom:12px;
+  }
+  .gl-hero .far{font-size:10.5px; letter-spacing:.5px; text-transform:uppercase; color:var(--gold-2); font-weight:700;}
+  .gl-hero .loc{font-size:19px; font-weight:800; margin-top:5px;}
+  .gl-hero .code{font-size:13px; color:#c7d0e0; margin-top:3px;}
+  .gl-hero .code strong{color:#fff; font-size:17px;}
+
+  .gl-count{font-size:11.5px; color:#8a8271; margin-bottom:8px;}
+  .gl-scroll{overflow-x:auto; border:1.5px solid #E1DACB; border-radius:8px; background:#fff;}
+  .gl-scroll table{width:100%; border-collapse:collapse; min-width:100%;}
+  .gl-scroll thead th{
+    text-align:left; font-size:10px; color:#8a8271; font-weight:700; letter-spacing:.3px;
+    text-transform:uppercase; white-space:nowrap; padding:8px 9px; border-bottom:1px solid #E1DACB; background:#F0EDE4;
+  }
+  .gl-scroll tbody td{padding:8px 9px; border-bottom:1px solid #EFEBE0; font-size:12.5px; white-space:nowrap;}
+  .gl-scroll tbody tr:last-child td{border-bottom:none;}
+  .gl-scroll td.gl-grade{font-weight:700; color:var(--navy); position:sticky; left:0; background:inherit;}
+  .gl-scroll thead th:first-child{position:sticky; left:0; background:#F0EDE4; z-index:1;}
+  .gl-scroll mark{background:#F5DE8A; color:inherit; border-radius:2px; padding:0 1px;}
+
+  .gl-empty{text-align:center; padding:36px 16px; color:#8a8271; font-size:13px;}
+
+  .gl-cat-head h2{font-size:15px; color:var(--navy); margin:0;}
+  .gl-cat-head .sub{font-size:11.5px; color:#8a8271; margin-top:3px;}
+  .gl-title{font-size:14.5px; color:var(--navy); font-weight:700; margin:10px 0 2px;}
+  .gl-ref{font-size:11px; color:#8a8271; margin-bottom:10px;}
+
+  .gl-view{display:none;}
+  .gl-view.active{display:block;}
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <!-- ============ ECRAN LOGIN ============ -->
+  <div class="screen active" id="screen-login">
+    <div class="header">
+      <div class="eyebrow">Accès protégé</div>
+      <h1>SERVICE DU PERSONNEL</h1>
+    </div>
+    <div class="body">
+      <label for="login-code">Code d'accès</label>
+      <input type="password" id="login-code" placeholder="Entrez le code">
+      <div class="buttons">
+        <button class="action btn-gold" id="btn-login">ENTRER</button>
+      </div>
+      <div class="error-msg" id="login-error"></div>
+    </div>
+  </div>
+
+  <!-- ============ ECRAN MENU ============ -->
+  <div class="screen" id="screen-menu">
+    <div class="header">
+      <div class="eyebrow">Service du Personnel</div>
+      <h1>OUTILS DE CALCUL - VISA</h1>
+    </div>
+    <div class="body">
+      <div class="menu-item" data-target="screen-c1">
+        <div class="icon">DI</div>
+        <div class="txt"><b>Droit d'installation</b><span>Ancienneté et droit d'installation</span></div>
+      </div>
+      <div class="menu-item" data-target="screen-c3">
+        <div class="icon">BC</div>
+        <div class="txt"><b>BACons (30/360)</b><span>Bonification restante</span></div>
+      </div>
+      <div class="menu-item" data-target="screen-c4">
+        <div class="icon">AN</div>
+        <div class="txt"><b>AC intégration</b><span>Nombre de jours entre 2 dates</span></div>
+      </div>
+      <div class="menu-item" data-target="screen-c5">
+        <div class="icon">CN</div>
+        <div class="txt"><b>Calcul CNP</b><span>Compensatrice de congés non pris</span></div>
+      </div>
+      <div class="menu-item" data-target="screen-c6">
+        <div class="icon">AT</div>
+        <div class="txt"><b>Calcul AC Tsotra</b><span>Ancienneté Civile tsotra</span></div>
+      </div>
+      <div class="menu-item" data-target="screen-c7">
+        <div class="icon">GI</div>
+        <div class="txt"><b>Grille Indiciaire</b><span>Fonctionnaire / Auxiliaire (EFA)</span></div>
+      </div>
+      <div class="menu-item" data-target="screen-c8">
+        <div class="icon">DC</div>
+        <div class="txt"><b>Décret Création Corps</b><span>Ministère → Corps → Décret</span></div>
+      </div>
+      <div class="menu-item" data-target="screen-c9">
+        <div class="icon">GC</div>
+        <div class="txt"><b>Grilles Indiciaires (Corps)</b><span>Médecins, Police, Pénitentiaire, Magistrature…</span></div>
+      </div>
+      <div class="menu-item" data-target="screen-c10">
+        <div class="icon">CL</div>
+        <div class="txt"><b>Code Localité</b><span>Recherche Code ↔ Localité</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CALCUL 1 : DROIT D'INSTALLATION ============ -->
+  <div class="screen" id="screen-c1">
+    <div class="header">
+      <div class="eyebrow">Service du Personnel</div>
+      <h1>CALCUL DROIT D'INSTALLATION</h1>
+    </div>
+    <div class="body">
+      <button class="back-btn" data-back>&larr; Menu</button>
+
+      <label for="c1-retraite">Date de retraite</label>
+      <input type="text" id="c1-retraite" placeholder="jj/mm/aaaa" inputmode="numeric" maxlength="10">
+
+      <label for="c1-service">Date d'entrée</label>
+      <input type="text" id="c1-service" placeholder="jj/mm/aaaa" inputmode="numeric" maxlength="10">
+      <div class="hint">Format attendu : jj/mm/aaaa</div>
+
+      <div class="buttons">
+        <button class="action btn-gold" id="c1-calc">CALCULER</button>
+        <button class="action btn-outline" id="c1-reset">RÉINITIALISER</button>
+      </div>
+      <div class="error-msg" id="c1-error"></div>
+      <div class="result empty" id="c1-result"></div>
+    </div>
+  </div>
+
+  <!-- ============ CALCUL 3 : BACONS 30/360 ============ -->
+  <div class="screen" id="screen-c3">
+    <div class="header">
+      <div class="eyebrow">Service du Personnel</div>
+      <h1>CALCUL BACONS (30/360)</h1>
+    </div>
+    <div class="body">
+      <button class="back-btn" data-back>&larr; Menu</button>
+
+      <label for="c3-derniere">Date dernière situation</label>
+      <input type="text" id="c3-derniere" placeholder="jj/mm/aaaa" inputmode="numeric" maxlength="10">
+
+      <label for="c3-bonif">Date bonification</label>
+      <input type="text" id="c3-bonif" placeholder="jj/mm/aaaa" inputmode="numeric" maxlength="10">
+
+      <label for="c3-bonif-type">Type de bonification</label>
+      <select id="c3-bonif-type">
+        <option value="">-- Sélectionner --</option>
+        <option value="exceptionnelle">Exceptionnelle (24 mois)</option>
+        <option value="delf">DELF B1 B2 (24 mois)</option>
+        <option value="dalf">DALF C1 C2 (24 mois)</option>
+        <option value="autres">AUTRES</option>
+      </select>
+
+      <div class="row2">
+        <div>
+          <label for="c3-mois">Bonification (mois)</label>
+          <input type="text" id="c3-mois" placeholder="Ex: 8" inputmode="numeric" maxlength="3">
+        </div>
+        <div>
+          <label for="c3-jours">Bonification (jours)</label>
+          <input type="text" id="c3-jours" placeholder="Ex: 8" inputmode="numeric" maxlength="3">
+        </div>
+      </div>
+      <div class="hint">Format daty : jj/mm/aaaa</div>
+
+      <label>Type d'avancement</label>
+      <div class="toggle-group" id="c3-avancement-group">
+        <div class="toggle-btn active" data-years="2">Échelon</div>
+        <div class="toggle-btn" data-years="3">Classe</div>
+        <div class="toggle-btn" data-years="4">Reclas.Ind</div>
+        <div class="toggle-btn" data-years="2">Major.Ind</div>
+      </div>
+
+      <div class="buttons">
+        <button class="action btn-gold" id="c3-calc">CALCULER</button>
+        <button class="action btn-outline" id="c3-reset">RESET</button>
+      </div>
+      <div class="error-msg" id="c3-error"></div>
+      <div class="result empty" id="c3-result"></div>
+    </div>
+  </div>
+
+  <!-- ============ CALCUL 4 : ANCIENNETE CIVILE ============ -->
+  <div class="screen" id="screen-c4">
+    <div class="header">
+      <div class="eyebrow">Service du Personnel</div>
+      <h1>AC INTÉGRATION</h1>
+    </div>
+    <div class="body">
+      <button class="back-btn" data-back>&larr; Menu</button>
+
+      <label for="c4-derniere">Date dernière situation</label>
+      <input type="text" id="c4-derniere" placeholder="jj/mm/aaaa" inputmode="numeric" maxlength="10">
+
+      <label for="c4-integration">Date d'intégration</label>
+      <input type="text" id="c4-integration" placeholder="jj/mm/aaaa" inputmode="numeric" maxlength="10">
+      <div class="hint">Format daty : jj/mm/aaaa</div>
+
+      <label>Type d'avancement</label>
+      <div class="toggle-group" id="c4-avancement-group">
+        <div class="toggle-btn active" data-years="2">Échelon (2 ans)</div>
+        <div class="toggle-btn" data-years="3">Classe (3 ans)</div>
+        <div class="toggle-btn" data-years="4">Reclas.Ind (4 ans)</div>
+        <div class="toggle-btn" data-years="2">Major.Ind (2 ans)</div>
+      </div>
+
+      <div class="buttons">
+        <button class="action btn-gold" id="c4-calc">CALCULER</button>
+        <button class="action btn-outline" id="c4-reset">RÉINITIALISER</button>
+      </div>
+      <div class="error-msg" id="c4-error"></div>
+      <div class="result empty" id="c4-result"></div>
+    </div>
+  </div>
+
+  <!-- ============ CALCUL 5 : CNP ============ -->
+  <div class="screen" id="screen-c5">
+    <div class="header">
+      <div class="eyebrow">Service du Personnel</div>
+      <h1>CALCUL CNP</h1>
+    </div>
+    <div class="body">
+      <button class="back-btn" data-back>&larr; Menu</button>
+
+      <label>Décision 1</label>
+      <div class="toggle-group" id="c5-d1-group">
+        <div class="toggle-btn active" data-value="complet">Complet (12 mois)</div>
+        <div class="toggle-btn" data-value="incomplet">Incomplet</div>
+      </div>
+
+      <label>Décision 2</label>
+      <div class="toggle-group" id="c5-d2-group">
+        <div class="toggle-btn active" data-value="complet">Complet (12 mois)</div>
+        <div class="toggle-btn" data-value="incomplet">Incomplet</div>
+      </div>
+
+      <label>Décision 3</label>
+      <div class="toggle-group" id="c5-d3-group">
+        <div class="toggle-btn active" data-value="complet">Complet (12 mois)</div>
+        <div class="toggle-btn" data-value="incomplet">Incomplet</div>
+      </div>
+
+      <label for="c5-retraite">Date de retraite</label>
+      <input type="text" id="c5-retraite" placeholder="jj/mm/aaaa" inputmode="numeric" maxlength="10">
+      <div class="hint">Format daty : jj/mm/aaaa — pour la/les Décision(s) Incomplet(es)</div>
+
+      <div class="buttons">
+        <button class="action btn-gold" id="c5-calc">CALCULER</button>
+        <button class="action btn-outline" id="c5-reset">RÉINITIALISER</button>
+      </div>
+      <div class="error-msg" id="c5-error"></div>
+      <div class="result empty" id="c5-result"></div>
+    </div>
+  </div>
+
+  <!-- ============ CALCUL 6 : AC TSOTRA (Ancienneté Civile) ============ -->
+  <div class="screen" id="screen-c6">
+    <div class="header">
+      <div class="eyebrow">Service du Personnel</div>
+      <h1>CALCUL AC TSOTRA</h1>
+    </div>
+    <div class="body">
+      <button class="back-btn" data-back>&larr; Menu</button>
+
+      <label for="c6-derniere">Date dernière situation</label>
+      <input type="text" id="c6-derniere" placeholder="jj/mm/aaaa" inputmode="numeric" maxlength="10">
+
+      <div class="row2">
+        <div>
+          <label for="c6-mois">AC / Bonification restante (mois)</label>
+          <input type="text" id="c6-mois" placeholder="Ex: 4" inputmode="numeric" maxlength="3">
+        </div>
+        <div>
+          <label for="c6-jours">AC / Bonification restante (jours)</label>
+          <input type="text" id="c6-jours" placeholder="Ex: 22" inputmode="numeric" maxlength="3">
+        </div>
+      </div>
+      <div class="hint">Format daty : jj/mm/aaaa — 30 jours = 1 mois</div>
+
+      <label>Type d'avancement</label>
+      <div class="toggle-group" id="c6-avancement-group">
+        <div class="toggle-btn active" data-years="2">Échelon (2 ans)</div>
+        <div class="toggle-btn" data-years="3">Classe (3 ans)</div>
+        <div class="toggle-btn" data-years="4">Reclas.Ind (4 ans)</div>
+        <div class="toggle-btn" data-years="2">Major.Ind (2 ans)</div>
+      </div>
+
+      <div class="buttons">
+        <button class="action btn-gold" id="c6-calc">CALCULER</button>
+        <button class="action btn-outline" id="c6-reset">RÉINITIALISER</button>
+      </div>
+      <div class="error-msg" id="c6-error"></div>
+      <div class="result empty" id="c6-result"></div>
+    </div>
+  </div>
+
+  <!-- ============ CALCUL 7 : GRILLE INDICIAIRE ============ -->
+  <div class="screen" id="screen-c7">
+    <div class="header">
+      <div class="eyebrow">Service du Personnel</div>
+      <h1>GRILLE INDICIAIRE</h1>
+    </div>
+    <div class="body">
+      <button class="back-btn" data-back>&larr; Menu</button>
+
+      <div class="toggle-group">
+        <div class="toggle-btn active" id="c7-mode-fonc">Fonctionnaire</div>
+        <div class="toggle-btn" id="c7-mode-aux">Auxiliaire (EFA)</div>
+      </div>
+
+      <div class="mode-section active" id="c7-section-fonc">
+        <label for="c7-grade">Grade</label>
+        <select id="c7-grade">
+          <option value="EX2E">EX2E</option>
+          <option value="EX1E">EX1E</option>
+          <option value="PR3E">PR3E</option>
+          <option value="PR2E">PR2E</option>
+          <option value="PR1E">PR1E</option>
+          <option value="1C3E">1C3E</option>
+          <option value="1C2E">1C2E</option>
+          <option value="1C1E">1C1E</option>
+          <option value="2C3E">2C3E</option>
+          <option value="2C2E">2C2E</option>
+          <option value="2C1E">2C1E</option>
+          <option value="STOE">STOE</option>
+        </select>
+
+        <label for="c7-categorie">Catégorie</label>
+        <select id="c7-categorie">
+          <option value="I">I</option>
+          <option value="II">II</option>
+          <option value="III">III</option>
+          <option value="IV">IV</option>
+          <option value="V">V</option>
+          <option value="VI">VI</option>
+          <option value="VII">VII</option>
+          <option value="VIII">VIII</option>
+          <option value="IX">IX</option>
+          <option value="X">X</option>
+        </select>
+        <div class="hint">Grilles Indiciaires des Fonctionnaires — Corps sans statut particulier / EFA ≥ Cat. IV</div>
+      </div>
+
+      <div class="mode-section" id="c7-section-aux">
+        <label for="c7-aux-cat">Auxiliaire</label>
+        <select id="c7-aux-cat">
+          <option value="AUX I">AUX I</option>
+          <option value="AUX II">AUX II</option>
+          <option value="AUX III">AUX III</option>
+          <option value="AUX IV">AUX IV</option>
+        </select>
+
+        <label for="c7-aux-ech">Échelon</label>
+        <select id="c7-aux-ech">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+        </select>
+        <div class="hint">Tableau d'Indice EFA (Auxiliaire) — pour les EFA &lt; Cat. IV — indices au 01-01-78</div>
+      </div>
+
+      <div class="result-simple" id="c7-result">
+        <div class="lbl">Indice</div>
+        <div class="val" id="c7-indice-val">—</div>
+        <div class="sub" id="c7-annee-req"></div>
+        <div id="c7-aux-note" style="display:none; margin-top:16px; padding-top:14px; border-top:1px dashed #D8D0BC;">
+          <div class="lbl">Augure + 15</div>
+          <div class="val" id="c7-aux-plus">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CALCUL 8 : DECRET CREATION CORPS ============ -->
+  <div class="screen" id="screen-c8">
+    <div class="header">
+      <div class="eyebrow">Service du Personnel</div>
+      <h1>DÉCRET CRÉATION CORPS</h1>
+    </div>
+    <div class="body">
+      <button class="back-btn" data-back>&larr; Menu</button>
+
+      <label for="c8-ministere">Ministère</label>
+      <select id="c8-ministere"></select>
+
+      <label for="c8-corps">Corps</label>
+      <select id="c8-corps"></select>
+
+      <div class="result-simple" id="c8-result" style="text-align:left;">
+        <div class="lbl">Décret</div>
+        <div class="val" id="c8-decret-val" style="font-size:19px; line-height:1.4;">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CALCUL 9 : GRILLES INDICIAIRES PAR CORPS ============ -->
+  <div class="screen" id="screen-c9">
+    <div class="header">
+      <div class="eyebrow">Service du Personnel</div>
+      <h1>GRILLES INDICIAIRES (CORPS)</h1>
+    </div>
+    <div class="body">
+      <button class="back-btn" data-back>&larr; Menu</button>
+
+      <!-- Sous-vue 1 : catégories -->
+      <div class="gl-view active" id="c9-view-cat">
+        <div id="c9-cat-grid"></div>
+      </div>
+
+      <!-- Sous-vue 2 : liste des grilles d'une catégorie -->
+      <div class="gl-view" id="c9-view-list">
+        <button class="back-btn" id="c9-btn-back-cat">&larr; Retour</button>
+        <div class="gl-cat-head">
+          <h2 id="c9-cat-title"></h2>
+          <div class="sub" id="c9-cat-sub"></div>
+        </div>
+        <div id="c9-list-grid" style="margin-top:10px;"></div>
+      </div>
+
+      <!-- Sous-vue 3 : sélection Grade -> Indice -->
+      <div class="gl-view" id="c9-view-grille">
+        <button class="back-btn" id="c9-btn-back-list">&larr; Retour</button>
+
+        <div class="gl-title" id="c9-grille-title"></div>
+        <div class="gl-ref" id="c9-grille-ref"></div>
+
+        <label for="c9-grade">Grade</label>
+        <select id="c9-grade"></select>
+        <div class="hint" id="c9-grade-hint" style="display:none;"></div>
+
+        <div id="c9-catwrap" style="display:none;">
+          <label for="c9-catcol">Catégorie</label>
+          <select id="c9-catcol"></select>
+        </div>
+
+        <div class="result-simple" id="c9-result">
+          <div class="lbl">Indice</div>
+          <div class="val" id="c9-indice-val">—</div>
+          <div class="sub" id="c9-annee-req"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CALCUL 10 : CODE LOCALITE ============ -->
+  <div class="screen" id="screen-c10">
+    <div class="header">
+      <div class="eyebrow">Service du Personnel</div>
+      <h1>CODE LOCALITÉ</h1>
+    </div>
+    <div class="body">
+      <button class="back-btn" data-back>&larr; Menu</button>
+
+      <div class="gl-search">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="c10-q" type="text" placeholder="Ex : 501, Toamasina, Betafo…" autocomplete="off">
+        <button class="gl-clear" id="c10-clear" type="button">Effacer</button>
+      </div>
+      <select class="gl-select" id="c10-faritany"><option value="">Toutes les régions</option></select>
+
+      <div class="gl-hero" id="c10-hero">
+        <div class="far" id="c10-hero-far"></div>
+        <div class="loc" id="c10-hero-loc"></div>
+        <div class="code">Code : <strong id="c10-hero-code"></strong></div>
+      </div>
+
+      <div class="gl-count" id="c10-count"></div>
+      <div id="c10-results"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const ACCESS_CODE = "Phanuella";
+const AUTH_KEY = "cbman_authenticated";
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// Si déjà authentifié sur cet appareil, sauter l'écran de code
+try{
+  if(localStorage.getItem(AUTH_KEY) === 'yes'){
+    showScreen('screen-menu');
+  }
+} catch(e){}
+
+document.getElementById('btn-login').addEventListener('click', function(){
+  const val = document.getElementById('login-code').value;
+  if(val === ACCESS_CODE){
+    document.getElementById('login-error').textContent = "";
+    document.getElementById('login-code').value = "";
+    try{ localStorage.setItem(AUTH_KEY, 'yes'); } catch(e){}
+    showScreen('screen-menu');
+  } else {
+    document.getElementById('login-error').textContent = "Code incorrect";
+  }
+});
+document.getElementById('login-code').addEventListener('keydown', function(e){
+  if(e.key === 'Enter') document.getElementById('btn-login').click();
+});
+
+document.querySelectorAll('.menu-item').forEach(item => {
+  item.addEventListener('click', () => showScreen(item.dataset.target));
+});
+document.querySelectorAll('[data-back]').forEach(btn => {
+  btn.addEventListener('click', () => showScreen('screen-menu'));
+});
+
+// ================= UTILITAIRES COMMUNS =================
+function parseDate(str){
+  const parts = str.trim().split('/');
+  if(parts.length !== 3) throw new Error("format");
+  const j = parseInt(parts[0],10);
+  const m = parseInt(parts[1],10);
+  const a = parseInt(parts[2],10);
+  if(isNaN(j) || isNaN(m) || isNaN(a)) throw new Error("format");
+  if(m < 1 || m > 12 || j < 1 || j > 31) throw new Error("format");
+  const d = new Date(a, m-1, j);
+  if(d.getFullYear() !== a || d.getMonth() !== m-1 || d.getDate() !== j){
+    throw new Error("format");
+  }
+  return d;
+}
+function formatDate(d){
+  const j = String(d.getDate()).padStart(2,'0');
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const a = d.getFullYear();
+  return `${j}/${m}/${a}`;
+}
+function autoFormatDate(e){
+  let v = e.target.value.replace(/\D/g,'').slice(0,8);
+  if(v.length >= 5) v = v.slice(0,2)+'/'+v.slice(2,4)+'/'+v.slice(4);
+  else if(v.length >= 3) v = v.slice(0,2)+'/'+v.slice(2);
+  e.target.value = v;
+}
+function digitsOnly(e){
+  e.target.value = e.target.value.replace(/\D/g,'').slice(0,3);
+}
+function pyFloorDiv(a, b){ return Math.floor(a / b); }
+function pyMod(a, b){ return ((a % b) + b) % b; }
+
+// ================= TOGGLE TYPE D'AVANCEMENT (nombre d'options variable) =================
+function setupAvancementToggle(groupId, onChange){
+  const group = document.getElementById(groupId);
+  const btns = group.querySelectorAll('.toggle-btn');
+  btns.forEach(btn => {
+    btn.addEventListener('click', function(){
+      btns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      onChange(parseInt(this.dataset.years, 10));
+    });
+  });
+}
+function resetAvancementToggle(groupId){
+  const group = document.getElementById(groupId);
+  const btns = group.querySelectorAll('.toggle-btn');
+  btns.forEach((b,i) => b.classList.toggle('active', i===0));
+}
+function setupToggleGroup(groupId, onChange){
+  const group = document.getElementById(groupId);
+  const btns = group.querySelectorAll('.toggle-btn');
+  btns.forEach(btn => {
+    btn.addEventListener('click', function(){
+      btns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      onChange(this.dataset.value);
+    });
+  });
+}
+
+// ================= SELECT TYPE DE BONIFICATION =================
+function setupBonifTypeSelect(selectId, moisId, joursId){
+  const sel = document.getElementById(selectId);
+  const moisInput = document.getElementById(moisId);
+  const joursInput = document.getElementById(joursId);
+  sel.addEventListener('change', function(){
+    if(sel.value === '' ){
+      return;
+    }
+    if(sel.value === 'autres'){
+      moisInput.value = "";
+      joursInput.value = "";
+      moisInput.readOnly = false;
+      joursInput.readOnly = false;
+      moisInput.focus();
+    } else if(sel.value === 'ac_civile'){
+      moisInput.value = "0";
+      joursInput.value = "0";
+      moisInput.readOnly = true;
+      joursInput.readOnly = true;
+    } else {
+      moisInput.value = "24";
+      joursInput.value = "0";
+      moisInput.readOnly = true;
+      joursInput.readOnly = true;
+    }
+  });
+}
+
+/* =========================================================
+   CALCUL 1 : DROIT D'INSTALLATION
+   ========================================================= */
+(function(){
+  const table_annee = {
+    0:[0,0], 1:[0,14.4], 2:[0,28.8], 3:[1,13.2], 4:[1,27.6],
+    5:[2,12], 6:[2,26.4], 7:[3,10.8], 8:[3,25.2], 9:[4,9.6],
+    10:[4,24], 11:[5,8.4], 12:[5,22.8], 13:[6,7.2], 14:[6,21.6],
+    15:[7,6], 16:[7,20.4], 17:[8,4.8], 18:[8,19.2], 19:[9,3.6],
+    20:[9,18], 21:[10,2.4], 22:[10,16.8], 23:[11,1.2], 24:[11,15.6]
+  };
+  const table_mois = {0:0,1:1.2,2:2.4,3:3.6,4:4.8,5:6,6:7.2,7:8.4,8:9.6,9:10.8,10:12,11:13.2,12:14.4};
+  const table_jours = {0:0,1:0.03,2:0.08,3:0.12,4:0.15,5:0.19,6:0.24,7:0.27,8:0.31,9:0.36,10:0.39,11:0.43,12:0.48,13:0.51,14:0.55,15:0.60,16:0.63,17:0.67,18:0.72,19:0.75,20:0.79,21:0.84,22:0.87,23:0.91,24:0.96,25:0.99,26:1.03,27:1.08,28:1.11,29:1.15,30:1.20};
+
+  function str3(s){
+    const p = s.trim().split('/');
+    return [parseInt(p[0],10), parseInt(p[1],10), parseInt(p[2],10)];
+  }
+  function diffExact(finStr, debutStr){
+    let [j1,m1,a1] = str3(finStr);
+    const [j2,m2,a2] = str3(debutStr);
+    if(j1 < j2){ j1 += 30; m1 -= 1; }
+    const jours = j1 - j2;
+    if(m1 < m2){ m1 += 12; a1 -= 1; }
+    const mois = m1 - m2;
+    const annees = a1 - a2;
+    return [annees, mois, jours];
+  }
+
+  function calculer(){
+    const errorEl = document.getElementById('c1-error');
+    const resultEl = document.getElementById('c1-result');
+    errorEl.textContent = "";
+    try{
+      const retraite = document.getElementById('c1-retraite').value;
+      const service = document.getElementById('c1-service').value;
+      parseDate(retraite);
+      parseDate(service);
+
+      const [annees, mois, jours] = diffExact(retraite, service);
+
+      if(annees < 0 || mois < 0 || jours < 0 || !(mois in table_mois) || !(jours in table_jours)){
+        throw new Error("hors limites");
+      }
+
+      let mois_base, jours_base;
+      if(annees >= 25){ mois_base = 12; jours_base = 0; }
+      else { [mois_base, jours_base] = table_annee[annees]; }
+
+      const ajout_mois = table_mois[mois];
+      const ajout_jours = table_jours[jours];
+      const total = jours_base + ajout_mois + ajout_jours;
+      let mois_sup = Math.floor(total / 30);
+      let reste_jours = Math.round(total % 30);
+      if(reste_jours >= 30){
+        mois_sup += 1;
+        reste_jours = 0;
+      }
+      const total_mois = mois_base + mois_sup;
+
+      resultEl.classList.remove('empty');
+      resultEl.innerHTML =
+        `<span class="section-title">Ancienneté</span>` +
+        `<b>${annees}</b> Ans <b>${mois}</b> Mois <b>${jours}</b> Jours` +
+        `<span class="section-title second">Droit installation</span>` +
+        `<b>${total_mois}</b> Mois <b>${reste_jours}</b> Jours`;
+    } catch(e){
+      errorEl.textContent = "Erreur : Format jj/mm/aaaa";
+      resultEl.classList.add('empty');
+      resultEl.innerHTML = "";
+    }
+  }
+  function reset(){
+    document.getElementById('c1-retraite').value = "";
+    document.getElementById('c1-service').value = "";
+    document.getElementById('c1-error').textContent = "";
+    const r = document.getElementById('c1-result');
+    r.classList.add('empty'); r.innerHTML = "";
+  }
+  document.getElementById('c1-calc').addEventListener('click', calculer);
+  document.getElementById('c1-reset').addEventListener('click', reset);
+  document.getElementById('c1-retraite').addEventListener('input', autoFormatDate);
+  document.getElementById('c1-service').addEventListener('input', autoFormatDate);
+})();
+
+/* =========================================================
+   CALCUL 3 : BACONS 30/360
+   ========================================================= */
+(function(){
+  let avancementYears = 2;
+  setupAvancementToggle('c3-avancement-group', (y) => { avancementYears = y; });
+
+  function diff30_360(date1, date2){
+    const d1 = Math.min(date1.getDate(), 30);
+    const d2 = Math.min(date2.getDate(), 30);
+    const total = (date2.getFullYear()-date1.getFullYear())*360
+                + (date2.getMonth()-date1.getMonth())*30
+                + (d2-d1);
+    return [pyFloorDiv(total,360), pyFloorDiv(pyMod(total,360),30), pyMod(total,30)];
+  }
+  function soustraction30j(date, mois, jours){
+    let total = date.getFullYear()*360 + date.getMonth()*30 + Math.min(date.getDate(),30);
+    total -= (mois*30 + jours);
+    let annee = pyFloorDiv(total,360);
+    let reste = pyMod(total,360);
+    let m = pyFloorDiv(reste,30) + 1;
+    let jour = pyMod(reste,30);
+    if(jour === 0){ jour = 30; m -= 1; }
+    if(m === 0){ m = 12; annee -= 1; }
+    return new Date(annee, m-1, jour, 12, 0, 0);
+  }
+  function replaceYear(date, newYear){
+    const d = new Date(newYear, date.getMonth(), date.getDate(), 12, 0, 0);
+    if(d.getMonth() !== date.getMonth() || d.getDate() !== date.getDate()){
+      throw new Error("date invalide (29 février)");
+    }
+    return d;
+  }
+
+  function calculer(){
+    const errorEl = document.getElementById('c3-error');
+    const resultEl = document.getElementById('c3-result');
+    errorEl.textContent = "";
+    resultEl.classList.remove('ok','epuise');
+    try{
+      const d1 = parseDate(document.getElementById('c3-derniere').value);
+      const d2 = parseDate(document.getElementById('c3-bonif').value);
+      const moisStr = document.getElementById('c3-mois').value;
+      const joursStr = document.getElementById('c3-jours').value;
+      const mois = parseInt(moisStr,10);
+      const jours = parseInt(joursStr,10);
+      if(isNaN(mois) || isNaN(jours) || moisStr.trim()==="" || joursStr.trim()===""){
+        throw new Error("format");
+      }
+
+      const hasAC = d2 >= d1;
+      const [acA, acM, acJ] = hasAC ? diff30_360(d1, d2) : [0,0,0];
+      const total = acA*360 + acM*30 + acJ + mois*30 + jours;
+      const av = avancementYears;
+      const isACMode = document.getElementById('c3-bonif-type').value === 'ac_civile';
+      let txt, dateEffet, statusClass;
+
+      if(hasAC && total >= av*360){
+        statusClass = 'ok';
+        const reste = total - av*360;
+        const a = pyFloorDiv(reste,360);
+        const m = pyFloorDiv(pyMod(reste,360),30);
+        const j = pyMod(reste,30);
+        txt = isACMode
+          ? `<span class="status-ok">AC restant : ${a}a ${m}m ${j}j</span>`
+          : `<span class="status-ok">BACons restant : ${a}a ${m}m ${j}j</span>`;
+        dateEffet = d2;
+      } else {
+        statusClass = 'epuise';
+        const dateNormale = replaceYear(d1, d1.getFullYear() + av);
+        dateEffet = soustraction30j(dateNormale, mois, jours);
+        txt = isACMode
+          ? `<span class="status-epuise">AC épuisé</span>`
+          : `<span class="status-epuise">BACons épuisé</span>`;
+      }
+
+      resultEl.classList.remove('empty');
+      resultEl.classList.add(statusClass);
+      resultEl.innerHTML =
+        (hasAC ? `<span class="section-title">AC</span>${acA}a ${acM}m ${acJ}j` +
+        (isACMode ? '' : `<span class="section-title second">Total Conserver</span>${pyFloorDiv(total,360)}a ${pyFloorDiv(pyMod(total,360),30)}m ${pyMod(total,30)}j`)
+        : `<span class="section-title">AC</span>Aucune (bonification antérieure à la date dernière situation)`) +
+        `<span class="section-title second"></span>${txt}` +
+        `<span class="section-title second">Date effet</span>${formatDate(dateEffet)}`;
+    } catch(e){
+      errorEl.textContent = "Erreur format (jj/mm/aaaa)";
+      resultEl.classList.add('empty');
+      resultEl.classList.remove('ok','epuise');
+      resultEl.innerHTML = "";
+    }
+  }
+  function reset(){
+    document.getElementById('c3-derniere').value = "";
+    document.getElementById('c3-bonif').value = "";
+    document.getElementById('c3-bonif-type').value = "";
+    document.getElementById('c3-mois').value = "";
+    document.getElementById('c3-mois').readOnly = false;
+    document.getElementById('c3-jours').value = "";
+    document.getElementById('c3-jours').readOnly = false;
+    avancementYears = 2;
+    resetAvancementToggle('c3-avancement-group');
+    document.getElementById('c3-error').textContent = "";
+    const r = document.getElementById('c3-result');
+    r.classList.add('empty'); r.classList.remove('ok','epuise'); r.innerHTML = "";
+  }
+  document.getElementById('c3-calc').addEventListener('click', calculer);
+  document.getElementById('c3-reset').addEventListener('click', reset);
+  document.getElementById('c3-derniere').addEventListener('input', autoFormatDate);
+  document.getElementById('c3-bonif').addEventListener('input', autoFormatDate);
+  document.getElementById('c3-mois').addEventListener('input', digitsOnly);
+  document.getElementById('c3-jours').addEventListener('input', digitsOnly);
+  setupBonifTypeSelect('c3-bonif-type', 'c3-mois', 'c3-jours');
+})();
+
+/* =========================================================
+   CALCUL 4 : ANCIENNETE CIVILE (jours entre 2 dates)
+   ========================================================= */
+(function(){
+  let avancementYears = 2;
+  setupAvancementToggle('c4-avancement-group', (y) => { avancementYears = y; });
+
+  function diffYMD(later, earlier){
+    let j1 = later.getDate(), m1 = later.getMonth()+1, a1 = later.getFullYear();
+    const j2 = earlier.getDate(), m2 = earlier.getMonth()+1, a2 = earlier.getFullYear();
+    let jours;
+    if(j1 < j2){ j1 += 30; m1 -= 1; }
+    jours = j1 - j2;
+    if(m1 < m2){ m1 += 12; a1 -= 1; }
+    const mois = m1 - m2;
+    const annees = a1 - a2;
+    return {years:annees, months:mois, days:jours};
+  }
+  function toDays30(date){
+    return date.getFullYear()*360 + date.getMonth()*30 + date.getDate();
+  }
+  function fromDays30(total){
+    let annee = Math.floor(total/360);
+    let reste = total - annee*360;
+    let mois = Math.floor(reste/30);
+    let jour = reste - mois*30;
+    if(jour === 0){ jour = 30; mois -= 1; }
+    if(mois < 0){ mois = 11; annee -= 1; }
+    if(mois > 11){ annee += Math.floor(mois/12); mois = ((mois%12)+12)%12; }
+    return new Date(annee, mois, jour, 12, 0, 0);
+  }
+  function addYMD30(date, years, months, days){
+    return fromDays30(toDays30(date) + years*360 + months*30 + days);
+  }
+  function formatDate(d){
+    const j = String(d.getDate()).padStart(2,'0');
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const a = d.getFullYear();
+    return `${j}/${m}/${a}`;
+  }
+
+  function calculer(){
+    const errorEl = document.getElementById('c4-error');
+    const resultEl = document.getElementById('c4-result');
+    errorEl.textContent = "";
+    resultEl.classList.remove('ok','epuise');
+    try{
+      const dateDerniere = parseDate(document.getElementById('c4-derniere').value);
+      const dateIntegration = parseDate(document.getElementById('c4-integration').value);
+
+      const early = dateDerniere <= dateIntegration ? dateDerniere : dateIntegration;
+      const late = dateDerniere <= dateIntegration ? dateIntegration : dateDerniere;
+
+      const ac = diffYMD(late, early);
+
+      const dateAvancement = addYMD30(dateIntegration, avancementYears, 0, 0);
+
+      const acDays = ac.years*360 + ac.months*30 + ac.days;
+      const requisDays = avancementYears*360;
+
+      let dateEffet, acLine, statusClass;
+
+      if(acDays >= requisDays){
+        statusClass = 'ok';
+        const resteDays = acDays - requisDays;
+        const a = Math.floor(resteDays/360);
+        const m = Math.floor((resteDays%360)/30);
+        const j = resteDays%30;
+        dateEffet = dateIntegration;
+        acLine = `<span class="section-title second"></span><span class="status-ok">AC = ${a}a ${m}m ${j}j</span>`;
+      } else {
+        statusClass = 'epuise';
+        dateEffet = addYMD30(dateAvancement, -ac.years, -ac.months, -ac.days);
+        acLine = `<span class="section-title second"></span><span class="status-epuise">AC épuisé</span>`;
+      }
+
+      resultEl.classList.remove('empty');
+      resultEl.classList.add(statusClass);
+      resultEl.innerHTML =
+        `<span class="section-title">AC (Ancienneté civile)</span>` +
+        `<b>${ac.years}</b> An ${ac.years>1?'s':''} <b>${ac.months}</b> Mois <b>${ac.days}</b> Jours` +
+        `<span class="section-title second">Date avancement</span>${formatDate(dateAvancement)}` +
+        acLine +
+        `<span class="section-title second">Nouvelle date d'effet</span><b>${formatDate(dateEffet)}</b>`;
+    } catch(e){
+      errorEl.textContent = "Erreur : Format jj/mm/aaaa";
+      resultEl.classList.add('empty');
+      resultEl.classList.remove('ok','epuise');
+      resultEl.innerHTML = "";
+    }
+  }
+  function reset(){
+    document.getElementById('c4-derniere').value = "";
+    document.getElementById('c4-integration').value = "";
+    avancementYears = 2;
+    resetAvancementToggle('c4-avancement-group');
+    document.getElementById('c4-error').textContent = "";
+    const r = document.getElementById('c4-result');
+    r.classList.add('empty'); r.classList.remove('ok','epuise'); r.innerHTML = "";
+  }
+  document.getElementById('c4-calc').addEventListener('click', calculer);
+  document.getElementById('c4-reset').addEventListener('click', reset);
+  document.getElementById('c4-derniere').addEventListener('input', autoFormatDate);
+  document.getElementById('c4-integration').addEventListener('input', autoFormatDate);
+})();
+
+/* =========================================================
+   CALCUL 5 : CNP (Compensatrice de Congés Non Pris)
+   ========================================================= */
+(function(){
+  let d1status = 'complet', d2status = 'complet', d3status = 'complet';
+  setupToggleGroup('c5-d1-group', v => d1status = v);
+  setupToggleGroup('c5-d2-group', v => d2status = v);
+  setupToggleGroup('c5-d3-group', v => d3status = v);
+
+  // Table 1 : nombre de mois COMPLETS écoulés depuis Janvier (0-12) -> jours CNP (2.5 jours/mois)
+  const table1_mois = {0:0,1:2.5,2:5,3:7.5,4:10,5:12.5,6:15,7:17.5,8:20,9:22.5,10:25,11:27.5,12:30};
+
+  // Table 2 : jour du mois en cours (plage) -> jours CNP additionnels
+  function table2_jours(j){
+    if(j <= 3) return 0;
+    if(j <= 8) return 0.5;
+    if(j <= 15) return 1;
+    if(j <= 20) return 1.5;
+    if(j <= 27) return 2;
+    return 2.5; // 28-30
+  }
+
+  // Décision Incomplet : compté depuis Janvier jusqu'au mois de la date de retraite
+  function partiel(dateRetraite){
+    const M = dateRetraite.getMonth() + 1; // 1-12
+    const D = dateRetraite.getDate();
+    const moisComplets = M - 1; // le mois précédant la date de retraite est le mois "complet"
+    const val = table1_mois[moisComplets] + table2_jours(D);
+    return Math.round(val * 100) / 100;
+  }
+
+  function calculer(){
+    const errorEl = document.getElementById('c5-error');
+    const resultEl = document.getElementById('c5-result');
+    errorEl.textContent = "";
+    try{
+      const needsDate = (d1status === 'incomplet' || d2status === 'incomplet' || d3status === 'incomplet');
+      let dateRetraite = null;
+      if(needsDate){
+        dateRetraite = parseDate(document.getElementById('c5-retraite').value);
+      }
+
+      function valDecision(status){
+        return status === 'complet' ? 30 : partiel(dateRetraite);
+      }
+
+      const d1 = valDecision(d1status);
+      const d2 = valDecision(d2status);
+      const d3 = valDecision(d3status);
+      const total = Math.round((d1 + d2 + d3) * 100) / 100;
+
+      resultEl.classList.remove('empty');
+      resultEl.innerHTML =
+        `<span class="section-title">Décision 1${d1status==='incomplet'?' (Incomplet)':''}</span>${d1} jours` +
+        `<span class="section-title second">Décision 2${d2status==='incomplet'?' (Incomplet)':''}</span>${d2} jours` +
+        `<span class="section-title second">Décision 3${d3status==='incomplet'?' (Incomplet)':''}</span>${d3} jours` +
+        `<span class="section-title second">TOTAL CNP</span><b>${total} jours</b>`;
+    } catch(e){
+      errorEl.textContent = "Erreur : Format jj/mm/aaaa";
+      resultEl.classList.add('empty');
+      resultEl.innerHTML = "";
+    }
+  }
+  function reset(){
+    document.getElementById('c5-retraite').value = "";
+    resetAvancementToggle('c5-d1-group'); d1status = 'complet';
+    resetAvancementToggle('c5-d2-group'); d2status = 'complet';
+    resetAvancementToggle('c5-d3-group'); d3status = 'complet';
+    document.getElementById('c5-error').textContent = "";
+    const r = document.getElementById('c5-result');
+    r.classList.add('empty'); r.innerHTML = "";
+  }
+  document.getElementById('c5-calc').addEventListener('click', calculer);
+  document.getElementById('c5-reset').addEventListener('click', reset);
+  document.getElementById('c5-retraite').addEventListener('input', autoFormatDate);
+})();
+
+/* =========================================================
+   CALCUL 6 : AC TSOTRA (Ancienneté Civile simple)
+   ========================================================= */
+(function(){
+  let avancementYears = 2;
+  setupAvancementToggle('c6-avancement-group', (y) => { avancementYears = y; });
+
+  function toDays30(date){
+    return date.getFullYear()*360 + date.getMonth()*30 + date.getDate();
+  }
+  function fromDays30(total){
+    let annee = Math.floor(total/360);
+    let reste = total - annee*360;
+    let mois = Math.floor(reste/30);
+    let jour = reste - mois*30;
+    if(jour === 0){ jour = 30; mois -= 1; }
+    if(mois < 0){ mois = 11; annee -= 1; }
+    if(mois > 11){ annee += Math.floor(mois/12); mois = ((mois%12)+12)%12; }
+    return new Date(annee, mois, jour, 12, 0, 0);
+  }
+  function addYMD30(date, years, months, days){
+    return fromDays30(toDays30(date) + years*360 + months*30 + days);
+  }
+  function formatDate(d){
+    const j = String(d.getDate()).padStart(2,'0');
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const a = d.getFullYear();
+    return `${j}/${m}/${a}`;
+  }
+
+  function calculer(){
+    const errorEl = document.getElementById('c6-error');
+    const resultEl = document.getElementById('c6-result');
+    errorEl.textContent = "";
+    try{
+      const dateDerniere = parseDate(document.getElementById('c6-derniere').value);
+      const moisStr = document.getElementById('c6-mois').value;
+      const joursStr = document.getElementById('c6-jours').value;
+      const mois = parseInt(moisStr,10);
+      const jours = parseInt(joursStr,10);
+      if(isNaN(mois) || isNaN(jours) || moisStr.trim()==="" || joursStr.trim()===""){
+        throw new Error("format");
+      }
+
+      const av = avancementYears;
+      const dateAvancement = addYMD30(dateDerniere, av, 0, 0);
+      const acDays = mois*30 + jours;
+      const requisDays = av*360;
+
+      let dateEffet, acLine, statusClass;
+
+      if(acDays >= requisDays){
+        statusClass = 'ok';
+        const resteDays = acDays - requisDays;
+        const a = Math.floor(resteDays/360);
+        const m = Math.floor((resteDays%360)/30);
+        const j = resteDays%30;
+        dateEffet = dateDerniere;
+        acLine = `<span class="section-title second"></span><span class="status-ok">AC = ${a}a ${m}m ${j}j</span>`;
+      } else {
+        statusClass = 'epuise';
+        dateEffet = addYMD30(dateAvancement, 0, -mois, -jours);
+        acLine = `<span class="section-title second"></span><span class="status-epuise">AC épuisé</span>`;
+      }
+
+      resultEl.classList.remove('empty');
+      resultEl.classList.remove('ok','epuise');
+      resultEl.classList.add(statusClass);
+      resultEl.innerHTML =
+        `<span class="section-title">AC / Bonification restante</span>${mois} Mois ${jours} Jours` +
+        `<span class="section-title second">Date avancement</span>${formatDate(dateAvancement)}` +
+        acLine +
+        `<span class="section-title second">Nouvelle date d'effet</span><b>${formatDate(dateEffet)}</b>`;
+    } catch(e){
+      errorEl.textContent = "Erreur : Format jj/mm/aaaa";
+      resultEl.classList.add('empty');
+      resultEl.innerHTML = "";
+    }
+  }
+  function reset(){
+    document.getElementById('c6-derniere').value = "";
+    document.getElementById('c6-mois').value = "";
+    document.getElementById('c6-jours').value = "";
+    avancementYears = 2;
+    resetAvancementToggle('c6-avancement-group');
+    document.getElementById('c6-error').textContent = "";
+    const r = document.getElementById('c6-result');
+    r.classList.add('empty'); r.classList.remove('ok','epuise'); r.innerHTML = "";
+  }
+  document.getElementById('c6-calc').addEventListener('click', calculer);
+  document.getElementById('c6-reset').addEventListener('click', reset);
+  document.getElementById('c6-derniere').addEventListener('input', autoFormatDate);
+  document.getElementById('c6-mois').addEventListener('input', digitsOnly);
+  document.getElementById('c6-jours').addEventListener('input', digitsOnly);
+})();
+
+/* =========================================================
+   CALCUL 7 : GRILLE INDICIAIRE
+   ========================================================= */
+(function(){
+  const table = {
+    "EX2E": {I:675, II:1020, III:1550, IV:1600, V:1750, VI:1850, VII:2225, VIII:2325, IX:2425, X:null},
+    "EX1E": {I:515, II:675, III:1020, IV:1550, V:1600, VI:1750, VII:1850, VIII:2225, IX:2325, X:2620},
+    "PR3E": {I:490, II:640, III:950, IV:1410, V:1460, VI:1610, VII:1710, VIII:2045, IX:2155, X:2520},
+    "PR2E": {I:460, II:605, III:885, IV:1285, V:1335, VI:1480, VII:1585, VIII:1880, IX:2000, X:2450},
+    "PR1E": {I:440, II:570, III:825, IV:1170, V:1220, VI:1360, VII:1465, VIII:1725, IX:1860, X:2220},
+    "1C3E": {I:415, II:540, III:765, IV:1065, V:1115, VI:1250, VII:1355, VIII:1585, IX:1725, X:2120},
+    "1C2E": {I:395, II:515, III:715, IV:970, V:1020, VI:1145, VII:1255, VIII:1455, IX:1600, X:1920},
+    "1C1E": {I:370, II:490, III:665, IV:880, V:930, VI:1055, VII:1160, VIII:1335, IX:1485, X:null},
+    "2C3E": {I:350, II:455, III:620, IV:800, V:850, VI:970, VII:1075, VIII:1225, IX:1380, X:null},
+    "2C2E": {I:310, II:435, III:580, IV:730, V:780, VI:900, VII:995, VIII:1125, IX:1280, X:null},
+    "2C1E": {I:295, II:415, III:540, IV:665, V:710, VI:815, VII:920, VIII:1035, IX:1185, X:null},
+    "STOE": {I:275, II:380, III:500, IV:605, V:650, VI:750, VII:850, VIII:950, IX:1100, X:null}
+  };
+  const anneeRequise = {
+    "EX2E":2, "EX1E":3, "PR3E":2, "PR2E":2, "PR1E":3,
+    "1C3E":2, "1C2E":2, "1C1E":3, "2C3E":2, "2C2E":2, "2C1E":1, "STOE":1
+  };
+  const tableAux = {
+    "AUX I":   {1:260, 2:264, 3:268, 4:276, 5:284, 6:288, 7:292, 8:300, 9:308},
+    "AUX II":  {1:276, 2:284, 3:292, 4:304, 5:316, 6:332, 7:348, 8:364, 9:380},
+    "AUX III": {1:356, 2:372, 3:388, 4:404, 5:420, 6:438, 7:455, 8:477, 9:499},
+    "AUX IV":  {1:420, 2:438, 3:455, 4:473, 5:499, 6:530, 7:560, 8:591, 9:619}
+  };
+
+  let mode = 'fonc';
+
+  function updateFonc(){
+    const grade = document.getElementById('c7-grade').value;
+    const cat = document.getElementById('c7-categorie').value;
+    const val = table[grade][cat];
+    document.getElementById('c7-indice-val').textContent = (val === null || val === undefined) ? "N/A" : val;
+    document.getElementById('c7-annee-req').textContent = `Année requise pour ${grade} : ${anneeRequise[grade]} an(s)`;
+  }
+  function updateAux(){
+    const aux = document.getElementById('c7-aux-cat').value;
+    const ech = document.getElementById('c7-aux-ech').value;
+    const val = tableAux[aux][ech];
+    document.getElementById('c7-indice-val').textContent = (val === null || val === undefined) ? "N/A" : val;
+    document.getElementById('c7-aux-plus').textContent = (val === null || val === undefined) ? "N/A" : (val + 15);
+    document.getElementById('c7-annee-req').textContent = `${aux} — Échelon ${ech}° (indice au 01-01-78)`;
+  }
+  function update(){
+    if(mode === 'fonc') updateFonc(); else updateAux();
+    document.getElementById('c7-aux-note').style.display = (mode === 'aux') ? 'block' : 'none';
+  }
+
+  document.getElementById('c7-grade').addEventListener('change', update);
+  document.getElementById('c7-categorie').addEventListener('change', update);
+  document.getElementById('c7-aux-cat').addEventListener('change', update);
+  document.getElementById('c7-aux-ech').addEventListener('change', update);
+
+  document.getElementById('c7-mode-fonc').addEventListener('click', function(){
+    mode = 'fonc';
+    this.classList.add('active');
+    document.getElementById('c7-mode-aux').classList.remove('active');
+    document.getElementById('c7-section-fonc').classList.add('active');
+    document.getElementById('c7-section-aux').classList.remove('active');
+    update();
+  });
+  document.getElementById('c7-mode-aux').addEventListener('click', function(){
+    mode = 'aux';
+    this.classList.add('active');
+    document.getElementById('c7-mode-fonc').classList.remove('active');
+    document.getElementById('c7-section-aux').classList.add('active');
+    document.getElementById('c7-section-fonc').classList.remove('active');
+    update();
+  });
+
+  update();
+})();
+
+/* =========================================================
+   CALCUL 8 : DECRET CREATION CORPS
+   ========================================================= */
+(function(){
+const corpsData = {
+"PENITENTIAIRE": [
+["Adjoints d'Administrations Pénitentiaires","66-173 du 30/03/1966"],
+["Agent pénitentiaire","2003-715 du 01/07/2003"],
+["Attaché d'administration Pénitentiaire","—"],
+["Encadreurs de l'Administration Pénitentiaire","2003-714 du 01/07/2003"],
+["Contrôleurs de l'Administration Pénitentiaire","2003-711 du 01/07/2003"],
+["Inspecteurs et Inspecteurs Généraux Pénitentiaire","2003-710 du 01/07/2003"],
+["Greffiers-Comptables de l'Administration Pénitentiaire","2003-713 du 01/07/2003"],
+["Educateurs Spécialisés de l'Administration Pénitentiaire","2003-712 du 01/07/2003"]
+],
+"SANTE": [
+["Adjoints de santé publique","77-092 du 08/04/1977"],
+["Aide sanitaire","76-345 du 09/10/1976"],
+["Assistant de santé","63-453 du 17/07/1963"],
+["Cadre des Experts vérificateurs en prothèse et orthopédie et des agents de maîtrise en prothèse dentaire et maxillo-faciale","—"],
+["Chirurgien-dentiste Cat. VIII","62-578 du 14/11/1962"],
+["Econome des hôpitaux","62-497 du 05/10/1962"],
+["Infirmier de l'assistance médicale","63-454 du 17/07/1963"],
+["Infirmier et infirmière diplômé de l'Etat","63-087 du 06/02/1963"],
+["Intendant des hôpitaux","63-086 du 06/02/1963"],
+["Médecin diplômé de l'Etat","62-070 du 14/02/1962"],
+["Médecin diplômé Université","64-363 du 09/09/1964"],
+["Médecins de l'Assistance Médicale","—"],
+["Pharmacien diplômé de l'Etat","62-528 du 24/10/1962"],
+["Pharmacien de l'assistance médicale","64-100 du 26/03/1964"],
+["Sage-femme diplômé de l'Etat","62-520 du 10/10/1962"],
+["Sage-femme d'assistance médicale","62-349 du 13/07/1962"]
+],
+"TRESOR": [
+["Contrôleur de trésor","61-486 du 23/08/1961"],
+["Comptable de trésor","61-487 du 23/08/1961"],
+["Inspecteur de trésor","62-098 du 28/02/1962"],
+["Précepteurs des finances","61-417 du 27/07/1961"],
+["Précepteurs Principaux des finances","2011-448 du 09/08/2011 modifiant certaines dispositions du Décret N°61-416 du 27/07/1961"]
+],
+"FINANCES": [
+["Administrateurs Adjoints des Services Financiers (A.A.S.F.)","2004-845 du 31/08/2004"],
+["Administrateurs des Services Financiers (A.S.F.)","2003-991 du 30/09/2003 modifié par le Décret N°2005-076 du 01/02/2005"],
+["Administrateurs Financiers","2003-991 du 30/08/2003"],
+["Chefs de bureaux des Services Financiers","61-414 du 27/07/1961"],
+["Sous-chefs de Bureau des Services Financiers","—"],
+["Contrôleur d'Etat","61-014 du 11/01/1961"],
+["Inspecteurs et Inspecteurs Général de l'Etat","2013-722 du 18/09/2013"],
+["Assistant Sociale de l'Etat","66-102 du 12/03/1966"]
+],
+"FOP": [
+["Contrôleurs de Travail et des Lois Sociales","61-227 du 19/05/1961"],
+["Inspecteurs de Travail et des Lois Sociales","61-226 du 19/05/1961"]
+],
+"IMPOT": [
+["Agent d'Assiette de Contributions Directes","61-516 du 21/11/1961"],
+["Agent de constatation de l'enregistrement et du timbre","61-589 du 02/11/1961"],
+["Agent de constatation de contribution indirecte","61-522 du 13/09/1961"],
+["Brigadiers des Contributions Indirectes","—"],
+["Contrôleur de contribution directe","60-512 du 21/12/1960"],
+["Contrôleur de contribution indirecte","61-521 du 13/09/1961"],
+["Contrôleur de l'Enregistrement et du Timbre","61-588 du 02/11/1961"],
+["Inspecteur de contribution directe","61-004 du 05/01/1961"],
+["Inspecteur de contribution indirecte","61-635 du 29/11/1961"],
+["Inspecteur de l'enregistrement et du timbre","61-587 du 02/11/1961"],
+["Inspecteur des impôts","61-004 du 05/01/1961"],
+["Préposés des Contributions Indirectes","—"]
+],
+"INTERIEUR": [
+["Régime particulier du corps des Administrateurs civils","2006-340 du 30/05/2006"],
+["Administrateur Civil (A.C)","60-469 du 23/09/1960"]
+],
+"JEUNESSE ET SPORT": [
+["Animateurs et Animatrices de la Jeunesse et de l'Education Populaire","80-002 du 07/01/1980"],
+["Conseiller à la Jeunesse et Education populaire","80-004 du 07/01/1980"],
+["Coordonnateur","80-003 du 07/07/1980"],
+["Inspecteurs de la Jeunesse et des Sports","96-1214 du 27/11/1996"]
+],
+"MINES": [
+["Adjoints Techniques des Mines, de la Géologie, de l'Hydrogéologie et des Techniques Industrielles","62-507 du 05/10/1962"],
+["Employés Techniques des Mines, de la Géologie et des Techniques Industrielles","—"],
+["Géologues et Hydrogéologues","—"],
+["Ingénieurs en chef des Mines","—"],
+["Ingénieurs des Mines","63-041 du 23/01/1963"],
+["Ingénieurs principaux des mines","—"],
+["Ingénieurs des Techniques Industriels des Mines","—"]
+],
+"MAGISTRATS": [
+["Attaché de Services Judiciaires","—"],
+["Magistrat et Magistrat suppléant","—"],
+["Greffiers","2005-597 du 28/06/2005"],
+["Greffiers en Chef","2005-597 du 28/06/2005"],
+["Officiers des Services Judiciaires","—"]
+],
+"METEOROLOGIE": [
+["Adjoints techniques de la météorologie","63-169 du 06/03/1963"]
+],
+"POPULATION": [
+["Assistant Sociales DE","66-102 du 02/03/1966"]
+],
+"POLICE": [
+["Commissaires de police","2002-1546 du 03/12/2002"],
+["Inspecteur de police","2002-1548 du 03/12/2002"],
+["Inspecteurs généraux, Contrôleurs généraux et Commissaires de Police","2002-1546 du 03/12/2002"],
+["Officier de police","2002-1547 du 03/12/2002"]
+],
+"AGRICULTURE": [
+["Adjoints Techniques d'Agriculture (1962)","62-650 du 21/12/1962"],
+["Adjoints Techniques d'Equipement Rural (DRDR & CFFAMMA)","62-515 du 10/10/1962"],
+["Adjoints Techniques d'Agriculture (1996)","96-490 du 05/10/1996"],
+["Adjoints Techniques d'Equipement Rural","62-144 du 21/03/1962"],
+["Ingénieur d'Equipement Rural","63-179 du 13/03/1963"],
+["Ingénieur en chef d'Agriculture","—"],
+["Ingénieur d'Agriculture","62-649 du 21/12/1962"]
+],
+"AMENAGEMENT": [
+["Architecte","—"],
+["Adjoints techniques des travaux publics","61-236 du 24/05/1961"],
+["Adjoints Techniques du Service Géographique","63-475 du 30/07/1963"],
+["Arpenteurs du Service Topographique","62-311 du 28/06/1962"],
+["Statut particulier du cadre des Assistants Rédacteurs des Domaines et de la Propriété Foncière","61-444 du 22/05/1961"],
+["Contrôleur des domaines","61-443 du 31/07/1961"],
+["Contrôleurs des Domaines et de la Propriété Foncière","61-443 du 31/07/1961"],
+["Employés Techniques des Travaux Publics","—"],
+["Géomètres du service topographique","62-313 du 28/06/1962"],
+["Géomètres DPLG","—"],
+["Ingénieurs géographes","—"],
+["Ingénieur des services topographiques","62-647 du 21/12/1962"],
+["Ingénieur des Travaux Publics","61-451 du 31/07/1961"],
+["Ingénieurs principaux des travaux publics","—"],
+["Ingénieur en Chef des Services Topographique","62-647 du 21/12/1962"],
+["Inspecteurs des Domaines","61-445 du 31/07/1961"],
+["Inspecteurs Principaux des Domaines","—"],
+["Inspecteurs des Travaux Publics","—"],
+["Inspecteur de domaines et de la Propriété Foncière","61-445 du 31/07/1961"],
+["Statut particulier du cadre des Contrôleurs des Domaines et de la Propriété Foncière","61-443 du 20/05/1961"]
+],
+"COMMERCE": [
+["Commissaire du commerce et concurrence","66-487 du 23/08/1961"],
+["Contrôleur des Prix et enquête économique commerce","61-279 du 03/06/1961 modifié par le Décret N°69-514 du 05/11/1969 et Décret N°71-243 du 25/05/1971"],
+["Commissaires au Prix, enquête économique","—"]
+],
+"DOUANE": [
+["Agent de constatation des douanes","61-161 du 15/03/1961"],
+["Agent d'encadrement des douanes","61-162 du 15/03/1961"],
+["Brigadiers des douanes","61-160 du 15/03/1961"],
+["Contrôleurs de douanes","61-160 du 15/03/1961"],
+["Inspecteurs de douanes","61-159 du 15/03/1961"],
+["Préposés de douanes","61-163 du 15/03/1961"]
+],
+"EAUX ET FORETS": [
+["Assistants d'Hygiène et Assainissement","73-319 du 18/12/1973"],
+["Adjoints Techniques d'Hygiène et Assainissement","64-371 du 09/09/1964"],
+["Adjoints Techniques des Eaux et des Forêts","62-516 du 10/10/1962"],
+["Agent Technique des Eaux et Forêts","62-492 du 05/10/1962"],
+["Ingénieur des Eaux et des Forêts","63-180 du 13/03/1963"],
+["Ingénieurs Principal en Chef","—"],
+["Ingénieurs","—"]
+],
+"ELEVAGES": [
+["Assistant d'Elevage","62-518 du 10/10/1962"],
+["Ingénieurs de l'Elevage","65-579 du 19/05/1965"],
+["Vétérinaire-Inspecteurs de l'Elevage","65-331 du 14/04/1965"],
+["Adjoints Techniques de l'Elevage","62-517 du 10/10/1962"]
+],
+"ENVIRONNEMENT": [
+["Ingénieurs des Eaux et des Forêts","63-180 du 13/03/1963"],
+["Adjoints Techniques des Eaux et des Forêts","62-516 du 10/10/1962"],
+["Ingénieurs Principaux, Chefs des Eaux et des Forêts","—"]
+],
+"MEN": [
+["Adjoint d'Administration","60-471 du 23/11/1960"],
+["Adjoint d'Administration Académique","61-543 du 11/10/1961"],
+["Adjoints de Service","83-056 du 27/01/1983"],
+["Adjoints Techniques de Planification","2003-412 du 27/03/2003"],
+["Agent Technique d'Animation, d'Alphabétisation et d'Education de Base","68-042 du 16/01/1968"],
+["Assistant d'Administration","60-472 du 23/11/1960"],
+["Assistant de Service","83-057 du 27/01/1983"],
+["Attaché de service","—"],
+["Attaché d'Administration","60-470 du 23/11/1960"],
+["Attaché de Planifications","2003-412 du 27/03/2003 modifié par le Décret N°2006-810 du 27/01/2006"],
+["Planificateur","2003-412 du 27/03/2003 modifié par le Décret N°2006-810 du 27/01/2006"],
+["Planificateur Principal","2003-412 du 27/03/2003 modifié par le Décret N°2006-810 du 27/01/2006"],
+["Attaché de Planification","2003-412 du 27/03/2003 modifié par le Décret N°2006-810 du 27/01/2006"],
+["Chargés d'Enseignement","61-546 du 11/10/1961"],
+["Concepteur","96-746 du 27/08/1996"],
+["Contremaître de l'Enseignement Technique","66-157 du 28/03/1966"],
+["Econome des Etablissements Scolaires","63-479 du 30/07/1963"],
+["Employé d'Administration","60-473 du 23/11/1960"],
+["Employé de Service","83-058 du 27/01/1983"],
+["Encadreurs","96-749 du 27/08/1996"],
+["Instituteurs et Institutrices \"B\"","61-545 du 11/10/1961"],
+["Instituteurs et Institutrices \"C\"","61-544 du 11/10/1961"],
+["Instituteurs et Institutrices \"D\"","73-150 du 08/06/1973"],
+["Inspecteurs de l'Enseignement Primaire","74-060 du 18/02/1974 abrogeant et modifiant certaines dispositions du Décret N°63-476 du 30/07/1963"],
+["Moniteurs et Monitrices d'Education Physiques et Sportives","61-583 du 26/10/1961"],
+["Maîtresse Adjointes de l'Enseignement Technique","—"],
+["Maîtresse d'enseignement ménager","69-062 du 18/02/1969 abrogeant l'article 13 du Décret N°66-157 du 28/03/1966"],
+["Maîtresses-adjointes d'enseignement ménager","68-060 du 16/01/1968 abrogeant l'article 3 du Décret N°66-155 du 28/03/1966"],
+["Opérateurs","96-750 du 27/08/1996"],
+["Cadres de Planification","2003-412 du 27/03/2003"],
+["Planificateur adjoint","—"],
+["Planificateur Principaux","2003-412 du 27/03/2003 modifié par le Décret N°2006-810 du 27/10/2006"],
+["Professeurs Certifiés","61-369 du 18/07/1961"],
+["Professeurs d'EPS + CES","—"],
+["Professeurs d'Enseignement Technique","—"],
+["Professeurs Licenciés","61-366 du 13/07/1961"],
+["Professeur Technique Adjoint","63-896 du 06/02/1963"],
+["Réalisateurs","96-747 du 27/08/1996"],
+["Réalisateurs Adjoints","97-052 du 31/01/1997"],
+["Sous Opérateurs","96-751 du 27/08/1996"],
+["Techniciens Supérieurs","96-748 du 27/08/1996"],
+["Techniciens Supérieurs de Service","83-055 du 27/01/1983"],
+["Techniciens supérieurs de la planification","—"]
+]
+};
+
+  const ministereSel = document.getElementById('c8-ministere');
+  const corpsSel = document.getElementById('c8-corps');
+  const decretEl = document.getElementById('c8-decret-val');
+
+  const ministeres = Object.keys(corpsData);
+  ministereSel.innerHTML = ministeres.map(m => `<option value="${m}">${m}</option>`).join('');
+
+  function populateCorps(){
+    const m = ministereSel.value;
+    const list = corpsData[m];
+    corpsSel.innerHTML = list.map((row,i) => `<option value="${i}">${row[0]}</option>`).join('');
+    updateDecret();
+  }
+  function updateDecret(){
+    const m = ministereSel.value;
+    const idx = parseInt(corpsSel.value, 10);
+    const row = corpsData[m][idx];
+    decretEl.textContent = row ? row[1] : "—";
+  }
+
+  ministereSel.addEventListener('change', populateCorps);
+  corpsSel.addEventListener('change', updateDecret);
+
+  populateCorps();
+})();
+
+// ================= C9 : GRILLES INDICIAIRES (CORPS) + C10 : CODE LOCALITE =================
+(function(){
+
+const GRILLES = [
+  {
+    "titre": "GRILLES INDICIAIRES POUR LES ADMINISTRATEURS CIVILS",
+    "reference": "Cat.9, Code Corps : A10A",
+    "colonnes": ["GRADE", "INDICE", "ANNEE REQUISE"],
+    "lignes": [
+      ["STAG", 1600, 1], ["2C1E", 1700, 1], ["2C2E", 1850, 2], ["2C3E", 2050, 2],
+      ["1C1E", 2250, 2], ["1C2E", 2400, 3], ["1C3E", 2600, 2],
+      ["Principal en Chef 1° Echelon", 2800, 3], ["Principal en Chef 2° Echelon", 2950, 2],
+      ["Principal en Chef 3° Echelon", 3150, 2], ["EX1E", 3350, 3], ["EX2E", 3450, 2]
+    ]
+  },
+  {
+    "titre": "GRILLES INDICIAIRES « ADMINISTRATEURS DES SERVICES FINANCIERS » (A.S.F.)",
+    "reference": "",
+    "colonnes": ["GRADE", "ANNEE REQUISE", "VI", "VIII"],
+    "lignes": [
+      ["STOE",1,750,950],["2C1E",1,815,1035],["2C2E",2,900,1125],["2C3E",2,970,1225],
+      ["1C1E",3,1050,1335],["1C2E",2,1145,1455],["1C3E",2,1250,1585],["PR1E",3,1360,1725],
+      ["PR2E",2,1480,1880],["PR3E",2,1610,2045],["EX1E",3,1750,2225],["EX2E",2,1850,2325],
+      ["EX3E",4,2225,2425],["EX4E",4,2325,2525],["EX5E",4,2425,2625],["EX6E",4,2525,2725],
+      ["EX7E",4,2625,2825],["EX8E",4,2725,3020],["EX9E",4,2825,3120]
+    ]
+  },
+  {
+    "titre": "AGENTS ET BRIGADIERS DE POLICE",
+    "reference": "Cat.3, Code Corps : B10B",
+    "colonnes": ["GRADE", "CODE GRADE", "INDICE", "ANNEE REQUISE"],
+    "lignes": [
+      ["Agent de Police Stagiaire","STOE",700,1],["Agent de Police 1°Echelon","AP1E",800,1],
+      ["Agent de Police 2°Echelon","AP2E",900,2],["Agent de Police 3°Echelon","AP3E",1000,2],
+      ["Sous Brigadier de Police 1°Echelon","SB1E",1025,1],["Sous Brigadier de Police 2°Echelon","SB2E",1050,2],
+      ["Sous Brigadier de Police 3°Echelon","SB3E",1075,2],["Brigadier de Police 1°Echelon","BP1E",1100,1],
+      ["Brigadier de Police 2°Echelon","BP2E",1125,2],["Brigadier de Police 3°Echelon","BP3E",1150,2],
+      ["Brigadier-Chef de Police 1°Echelon","BC1E",1175,1],["Brigadier-Chef de Police 2°Echelon","BC2E",1200,2],
+      ["Brigadier-Chef de Police 3°Echelon","BC3E",1250,2]
+    ]
+  },
+  {
+    "titre": "GRILLES INDICIAIRES DES AGENTS PENITENTIAIRES",
+    "reference": "Cat.II — applicable pour compter du 25/01/2014",
+    "colonnes": ["GRADE", "Anciens : Encadreurs Pénitentiaire (C17D, Cat.II)", "Nouveaux : Encadreurs d'Administration Pénitentiaire (B17E, Cat.IV)", "ANNEE REQUISE"],
+    "lignes": [
+      ["STOE",850,850,1],["2C1E",950,950,1],["2C2E",1000,1000,1],["2C3E",1050,1050,1],
+      ["2C4E",1100,1100,1],["2C5E",1150,1150,1],["1C1E",1250,1250,1],["1C2E",1300,1300,1],
+      ["1C3E",1350,1350,1],["1C4E",1400,1400,1],["1C5E",1450,1450,1],["PR1E",1550,1550,1],
+      ["PR2E",1600,1600,1],["PR3E",1650,1650,1],["PR4E",1700,1700,1],["PR5E",1750,1750,1],
+      ["EX1E",1850,1850,1],["EX2E",1900,1900,1],["EX3E",1950,1950,1],["EX4E",2000,2000,1],["EX5E",2050,2050,1]
+    ]
+  },
+  {
+    "titre": "GRILLES INDICIAIRES DU PERSONNEL JUDICIAIRE « GREFFIERS »",
+    "reference": "",
+    "colonnes": ["GRADE","ANNEE REQUISE","Employés de Services (I)","Assistants de Sce Judiciaires (II)","S.E. Greffier de Chambre (III)","Greffiers des Sce Judiciaires (IV)","Greffier en Chef des Sce Judiciaires (V)","Greffier en Chef Réalisateur des Sce Judiciaires (VI)","Greffier en Chef Concepteurs des Sce Judiciaires (VII)","Officiers des Sce Judiciaires (VIII)"],
+    "lignes": [
+      ["STOE",1,275,380,500,605,650,750,850,950],
+      ["2C1E",1,295,415,540,665,710,815,920,1035],
+      ["2C2E",2,310,435,580,730,780,900,995,1125],
+      ["2C3E",2,335,455,620,800,850,970,1075,1225],
+      ["1C1E",3,355,490,665,880,930,1055,1160,1335],
+      ["1C2E",2,375,515,715,970,1020,1145,1255,1455],
+      ["1C3E",2,400,540,765,1065,1115,1250,1355,1585],
+      ["PR1E",3,425,570,825,1170,1220,1360,1465,1725],
+      ["PR2E",2,455,605,885,1285,1335,1480,1585,1880],
+      ["PR3E",2,485,640,1285,1335,1460,1610,1710,2045],
+      ["EX1E",3,515,675,1410,1460,1600,1750,1850,2225],
+      ["EX2E",2,675,1020,1550,1600,1750,1850,2225,2325]
+    ]
+  },
+  {
+    "titre": "GRILLES INDICIAIRES « INGENIEURS DES MINES »",
+    "reference": "",
+    "colonnes": ["GRADE","ANNEE REQUISE","VIII","VI"],
+    "lignes": [
+      ["ST0E",1,950,750],["2C1E",1,1035,815],["2C2E",2,1125,900],["2C3E",2,1225,970],
+      ["1C1E",3,1335,1105],["1C2E",2,1455,1195],["1C3E",2,1585,1290],["PR1E",3,1725,1390],
+      ["PR2E",2,1880,1500],["PR3E",2,2045,1610],["EX1E",3,2225,1750],["EX2E",2,2325,1850],
+      ["EX3E",4,2425,2225],["EX4E",4,2525,2325],["EX5E",4,2625,2520],["EX6E",4,2725,2620],
+      ["EX7E",4,2825,2720],["EX8E",4,3020,2820],["EX9E",4,3120,2920]
+    ]
+  },
+  {
+    "titre": "INSPECTEURS GENERAUX, CONTROLEURS GENERAUX ET COMMISSAIRES DE POLICE",
+    "reference": "Cat.9, Code Corps : A10A",
+    "colonnes": ["GRADE","CODE GRADE","INDICE","ANNEE REQUISE"],
+    "lignes": [
+      ["Commissaire de Police Stagiaire","STOE",1550,1],["Commissaire de Police 2°Classe 1°Echelon","2C1E",1700,1],
+      ["Commissaire de Police 2°Classe 2°Echelon","2C2E",1800,2],["Commissaire de Police 2°Classe 3°Echelon","2C3E",1900,2],
+      ["Commissaire de Police 1°Classe 1°Echelon","1C1E",2050,1],["Commissaire de Police 1°Classe 2°Echelon","1C2E",2150,2],
+      ["Commissaire de Police 1°Classe 3°Echelon","1C3E",2250,2],["Commissaire Principal de Police 1°Echelon","PR1E",2350,1],
+      ["Commissaire Principal de Police 2°Echelon","PR2E",2450,2],["Commissaire Principal de Police 3°Echelon","PR3E",2550,2],
+      ["Commissaire Divisionnaire 1°Echelon","CD1E",2650,1],["Commissaire Divisionnaire 2°Echelon","CD2E",2750,2],
+      ["Commissaire Divisionnaire 3°Echelon","CD3E",2850,2],["Contrôleur Général de Police 1°Echelon","CG1E",2950,1],
+      ["Contrôleur Général de Police 2°Echelon","CG2E",3000,2],["Contrôleur Général de Police 3°Echelon","CG3E",3050,2],
+      ["Inspecteur Général de Police 1°Echelon","IG1E",3150,1],["Inspecteur Général de Police 2°Echelon","IG2E",3300,2],
+      ["Inspecteur Général de Police 3°Echelon","IG3E",3450,2]
+    ]
+  },
+  {
+    "titre": "INSPECTEURS DE POLICE",
+    "reference": "Cat.5, Code Corps : A10C",
+    "colonnes": ["GRADE","CODE GRADE","INDICE","ANNEE REQUISE"],
+    "lignes": [
+      ["Inspecteur de Police Stagiaire","STOE",950,1],["Inspecteur de Police 2°Classe 1°Echelon","2C1E",1000,1],
+      ["Inspecteur de Police 2°Classe 2°Echelon","2C2E",1050,2],["Inspecteur de Police 2°Classe 3°Echelon","2C3E",1100,2],
+      ["Inspecteur de Police 1°Classe 1°Echelon","1C1E",1150,1],["Inspecteur de Police 1°Classe 2°Echelon","1C2E",1200,2],
+      ["Inspecteur de Police 1°Classe 3°Echelon","1C3E",1250,2],["Inspecteur Principal de Police 1°Echelon","PR1E",1350,1],
+      ["Inspecteur Principal de Police 2°Echelon","PR2E",1400,2],["Inspecteur Principal de Police 3°Echelon","PR3E",1450,2],
+      ["Inspecteur Principal de Police de Classe Exceptionnelle 1°Echelon","EX1E",1500,1],
+      ["Inspecteur Principal de Police de Classe Exceptionnelle 2°Echelon","EX2E",1550,2],
+      ["Inspecteur Principal de Police de Classe Exceptionnelle 3°Echelon","EX3E",1600,2]
+    ]
+  },
+  {
+    "titre": "GRILLES INDICIAIRES DU PERSONNEL JUDICIAIRE « MAGISTRATS »",
+    "reference": "Décret N° 2007-1106 du 08/12/2007, applicable p/c du 01/01/2008 — Cat. IX, Code Corps : A15A",
+    "colonnes": ["GRADE","INDICE"],
+    "lignes": [
+      ["STOE",1800],["G4/1E",1850],["G4/2E",2200],["G4/3E",2400],["G4/4E",2600],
+      ["G3/1E",2800],["G3/2E",3000],["G3/3E",3200],["G3/4E",3400],
+      ["G2/1E",3600],["G2/2E",3800],["G2/3E",3900],["G1/0E",4010]
+    ]
+  },
+  {
+    "titre": "GRILLES INDICIAIRES DES MEDECINS",
+    "reference": "Décret N° 2010/119 du 11/03/2010, applicable p/c du 01/01/2011",
+    "colonnes": ["GRADE","CAT.VIII (A94A)","CAT.IX (A94I)","ANNEE REQUISE"],
+    "lignes": [
+      ["ST0E",1600,1750,1],["2C1E",1700,1850,1],["2C2E",1850,2000,2],["2C3E",2050,2200,2],
+      ["1C1E",2250,2400,3],["1C2E",2400,2550,2],["1C3E",2600,2750,2],["PR1E",2800,2950,3],
+      ["PR2E",2950,3100,2],["PR3E",3150,3300,2],["EX1E",3350,3500,3],["EX2E",3450,3600,2],
+      ["EX3E",3550,3700,2],["EX4E",3650,3800,2],["EX5E",3750,3900,2],["EX6E",3850,4000,2],
+      ["EX7E",3950,4100,2],["EX8E",4050,4200,2],["EX9E",4150,4300,2]
+    ]
+  },
+  {
+    "titre": "OFFICIERS DE POLICE",
+    "reference": "Cat.7, Code Corps : A10B",
+    "colonnes": ["GRADE","CODE GRADE","INDICE","ANNEE REQUISE"],
+    "lignes": [
+      ["Officiers de Police Stagiaire","STOE",1000,1],["Officiers de Police 2°Classe 1°Echelon","2C1E",1100,1],
+      ["Officiers de Police 2°Classe 2°Echelon","2C2E",1200,2],["Officiers de Police 2°Classe 3°Echelon","2C3E",1300,2],
+      ["Officiers de Police 1°Classe 1°Echelon","1C1E",1400,1],["Officiers de Police 1°Classe 2°Echelon","1C2E",1500,2],
+      ["Officiers de Police 1°Classe 3°Echelon","1C3E",1600,2],["Officier Principal de Police 1°Echelon","PR1E",1700,1],
+      ["Officier Principal de Police 2°Echelon","PR2E",1800,2],["Officier Principal de Police 3°Echelon","PR3E",1900,2],
+      ["Officier Principal de Police de Classe Exceptionnelle 1°Echelon","EX1E",2050,1],
+      ["Officier Principal de Police de Classe Exceptionnelle 2°Echelon","EX2E",2150,2],
+      ["Officier Principal de Police de Classe Exceptionnelle 3°Echelon","EX3E",2250,2]
+    ]
+  },
+  {
+    "titre": "GRILLES INDICIAIRES DES AGENTS PENITENTIAIRES — Agents Pénitentiaire",
+    "reference": "Cat.I — Anciens D17D (Cat.I) / Nouveaux C17E (Cat.II) — applicable pour compter du 25/01/2014",
+    "colonnes": ["GRADE","Anciens D17D (Cat.I)","Nouveaux C17E (Cat.II)","ANNEE REQUISE"],
+    "lignes": [
+      ["STOE",750,750,1],["2C1E",800,800,1],["2C2E",850,850,1],["2C3E",900,900,1],
+      ["2C4E",950,950,1],["2C5E",1000,1000,1],["1C1E",1100,1100,1],["1C2E",1150,1150,1],
+      ["1C3E",1200,1200,1],["1C4E",1250,1250,1],["1C5E",1300,1300,1],["PR1E",1400,1400,1],
+      ["PR2E",1450,1450,1],["PR3E",1500,1500,1],["PR4E",1550,1550,1],["PR5E",1600,1600,1],
+      ["EX1E",1700,1700,1],["EX2E",1750,1750,1],["EX3E",1800,1800,1],["EX4E",1850,1850,1],["EX5E",1900,1900,1]
+    ]
+  },
+  {
+    "titre": "GRILLES INDICIAIRES DES AGENTS PENITENTIAIRES — Éducateurs Spécialisés Pénitentiaire",
+    "reference": "Cat.III — Anciens B17C (Cat.III) / Nouveaux A17E (Cat.VI) — applicable pour compter du 25/01/2014",
+    "colonnes": ["GRADE","Anciens B17C (Cat.III)","Nouveaux A17E (Cat.VI)","ANNEE REQUISE"],
+    "lignes": [
+      ["STOE",950,950,1],["2C1E",1075,1075,1],["2C2E",1125,1125,1],["2C3E",1175,1175,1],
+      ["2C4E",1225,1225,1],["2C5E",1275,1275,1],["1C1E",1400,1400,1],["1C2E",1450,1450,1],
+      ["1C3E",1500,1500,1],["1C4E",1550,1550,1],["1C5E",1600,1600,1],["PR1E",1725,1725,1],
+      ["PR2E",1775,1775,1],["PR3E",1825,1825,1],["PR4E",1875,1875,1],["PR5E",1925,1925,1],
+      ["EX1E",2050,2050,1],["EX2E",2100,2100,1],["EX3E",2150,2150,1],["EX4E",2200,2220,1],["EX5E",2250,2250,1]
+    ]
+  },
+  {
+    "titre": "GRILLES INDICIAIRES DES AGENTS PENITENTIAIRES — Inspecteur et Inspecteurs Généraux Pénitentiaire",
+    "reference": "Cat.VIII — Anciens/Nouveaux A17C — applicable pour compter du 25/01/2014",
+    "colonnes": ["GRADE","Anciens A17C (Cat.VIII)","Nouveaux A17C (Cat.VIII)","ANNEE REQUISE"],
+    "lignes": [
+      ["STOE",1400,1400,1],["2C1E",1500,1500,1],["2C2E",1550,1550,1],["2C3E",1600,1600,1],
+      ["2C4E",1650,1650,1],["2C5E",1700,1700,1],["1C1E",1800,1800,1],["1C2E",1850,1850,1],
+      ["1C3E",1900,1900,1],["1C4E",1950,1950,1],["1C5E",2000,2000,1],["PR1E",2100,2100,1],
+      ["PR2E",2150,2150,1],["PR3E",2200,2200,1],["PR4E",2250,2250,1],["PR5E",2300,2300,1],
+      ["EX1E",2400,2400,1],["EX2E",2450,2450,1],["EX3E",2500,2500,1],["EX4E",2550,2550,1],
+      ["EX5E",2600,2600,1],["GL1E",2700,2700,1],["GL2E",2800,2800,1],["GL3E",2900,2900,1],
+      ["GL4E",3000,3000,1],["GL5E",3100,3100,1]
+    ]
+  },
+  {
+    "titre": "GRILLES INDICIAIRES DU PERSONNEL JUDICIAIRE",
+    "reference": "Décret n°397-2005 du 28/06/2005",
+    "colonnes": ["GRADE","ANNEE REQUISE","D06A (Cat.I)","D15A (Cat.I)","C15E (Cat.II)","B15B (Cat.III)","B15E (Cat.IV)","A15H (Cat.V)","A15G (Cat.VI)","A15F (Cat.VII)"],
+    "lignes": [
+      ["STOE",1,260,300,380,500,605,650,750,950],
+      ["2C1E",1,280,315,415,540,665,710,815,1035],
+      ["2C2E",2,300,335,435,580,730,780,900,1125],
+      ["2C3E",2,320,350,455,620,800,850,970,1225],
+      ["1C1E",3,340,370,490,665,880,930,1055,1335],
+      ["1C2E",2,360,395,515,715,970,1020,1145,1455],
+      ["1C3E",2,400,415,540,765,1065,1115,1250,1585],
+      ["PR1E",3,425,440,570,825,1170,1220,1360,1725],
+      ["PR2E",2,445,460,605,885,1285,1335,1480,1880],
+      ["PR3E",2,480,490,640,1285,1335,1460,1610,2045],
+      ["EX1E",3,515,515,675,1410,1460,1600,1750,2225],
+      ["EX2E",2,675,1020,1020,1550,1600,1750,1850,2325]
+    ]
+  },
+  {
+    "titre": "GRILLES INDICIAIRES DES PLANIFICATEURS",
+    "reference": "",
+    "colonnes": ["GRADE","Adj.Tech. de Plan Cat IV (A70D)","Att.de Plan Cat.VI (A70C)","Plan Cat VII (A70B)","Plan Ppal Cat. VIII (A70A)","ANNEE REQUISE"],
+    "lignes": [
+      ["STAG",605,750,850,1225,1],["2C1E",665,815,920,1325,1],["2C2E",730,900,995,1455,2],
+      ["2C3E",800,970,1075,1585,2],["1C1E",880,1055,1170,1725,3],["1C2E",970,1145,1265,1880,2],
+      ["1C3E",1065,1250,1365,2045,2],["PR1E",1170,1360,1490,2225,3],["PR2E",1285,1480,1595,2325,2],
+      ["PR3E",1410,1610,1710,2425,2],["EX1E",1550,1750,1850,2525,3],["EX2E",1600,1850,2225,2625,2]
+    ]
+  },
+  {
+    "titre": "GRILLES INDICIAIRES « PREPOSES DES DOUANES »",
+    "reference": "Code Corps : D29B, Cat.I",
+    "colonnes": ["GRADE","INDICE","ANNEE REQUISE"],
+    "lignes": [
+      ["STOE",275,1],["2C1E",295,1],["2C2E",310,2],["2C3E",335,2],["1C1E",355,3],
+      ["1C2E",375,2],["1C3E",400,2],["PR1E",425,3],["PR2E",455,2],["PR3E",485,2],
+      ["EX1E",515,3],["EX2E",675,2],["EX3E",1020,4],["EX4E",1550,4],["EX5E",1600,4],
+      ["EX6E",1750,4],["EX7E",1850,4],["EX8E",2225,4],["EX9E",2325,4]
+    ]
+  }
+];
+
+const CATEGORIES = [
+  { id:'cat1', label:'Cadres & Services Techniques', sub:'Médecins, A.S.F., Mines, Planificateurs…',
+    items:[ {idx:9,label:'Médecins'}, {idx:1,label:'Administrateurs des Services Financiers (A.S.F.)'},
+      {idx:5,label:'Ingénieurs des Mines'}, {idx:15,label:'Planificateurs'},
+      {idx:0,label:'Administrateurs Civils'}, {idx:16,label:'Préposés des Douanes'} ] },
+  { id:'police', label:'Police', sub:'Agents, Inspecteurs, Officiers, Inspecteurs Généraux',
+    items:[ {idx:2,label:'Agents et Brigadiers de Police'}, {idx:7,label:'Inspecteurs de Police'},
+      {idx:10,label:'Officiers de Police'}, {idx:6,label:'Inspecteurs Généraux, Contrôleurs & Commissaires'} ] },
+  { id:'peniten', label:'Pénitentiaire', sub:'Cat. I, Cat. II, Cat. III, Cat. VIII',
+    items:[ {idx:11,label:'Cat. I — Agents Pénitentiaire'}, {idx:3,label:'Cat. II — Encadreurs Pénitentiaire'},
+      {idx:12,label:'Cat. III — Éducateurs Spécialisés'}, {idx:13,label:'Cat. VIII — Inspecteurs Généraux'} ] },
+  { id:'magistrat', label:'Magistrature & Judiciaire', sub:'Magistrats, Personnel Judiciaire, Greffiers',
+    items:[ {idx:8,label:'Magistrats'}, {idx:14,label:'Personnel Judiciaire (Décret 397-2005)'}, {idx:4,label:'Greffiers'} ] }
+];
+
+const LOCALITES = [
+  {f:"ANTANANARIVO", c:"101", l:"Antananarivo Renivohitra"},
+  {f:"ANTANANARIVO", c:"10101", l:"Antananarivo Renivohitra CU"},
+  {f:"ANTANANARIVO", c:"102", l:"Antananarivo Antsimondrano"},
+  {f:"ANTANANARIVO", c:"103", l:"Antananarivo Avaradrano"},
+  {f:"ANTANANARIVO", c:"104", l:"Ambatolampy"},
+  {f:"ANTANANARIVO", c:"105", l:"Ambohidratrimo"},
+  {f:"ANTANANARIVO", c:"106", l:"Andramasina"},
+  {f:"ANTANANARIVO", c:"107", l:"Anjozorobe"},
+  {f:"ANTANANARIVO", c:"108", l:"Ankazobe"},
+  {f:"ANTANANARIVO", c:"109", l:"Antanifotsy"},
+  {f:"ANTANANARIVO", c:"110", l:"Antsirabe I"},
+  {f:"ANTANANARIVO", c:"111", l:"Antsirabe II"},
+  {f:"ANTANANARIVO", c:"112", l:"Arivonimamo"},
+  {f:"ANTANANARIVO", c:"113", l:"Betafo"},
+  {f:"ANTANANARIVO", c:"114", l:"Faratsiho"},
+  {f:"ANTANANARIVO", c:"115", l:"Fenoarivo Afovoany"},
+  {f:"ANTANANARIVO", c:"116", l:"Manjakandriana"},
+  {f:"ANTANANARIVO", c:"117", l:"Miarinarivo"},
+  {f:"ANTANANARIVO", c:"118", l:"Soavinandriana"},
+  {f:"ANTANANARIVO", c:"119", l:"Tsiroanomandidy"},
+  {f:"ANTSIRANANA", c:"20101", l:"Diego Suarez"},
+  {f:"ANTSIRANANA", c:"202", l:"Antsiranana II"},
+  {f:"ANTSIRANANA", c:"203", l:"Ambanja"},
+  {f:"ANTSIRANANA", c:"204", l:"Ambilobe"},
+  {f:"ANTSIRANANA", c:"205", l:"Andapa"},
+  {f:"ANTSIRANANA", c:"206", l:"Antalaha"},
+  {f:"ANTSIRANANA", c:"207", l:"Nosy Be"},
+  {f:"ANTSIRANANA", c:"20705", l:"CU Nosy Be"},
+  {f:"ANTSIRANANA", c:"208", l:"Sambava"},
+  {f:"ANTSIRANANA", c:"209", l:"Vohimarina"},
+  {f:"FIANARANTSOA", c:"301", l:"Fianarantsoa I"},
+  {f:"FIANARANTSOA", c:"30101", l:"CU Fianarantsoa I"},
+  {f:"FIANARANTSOA", c:"302", l:"Fianarantsoa II"},
+  {f:"FIANARANTSOA", c:"303", l:"Ambalavao"},
+  {f:"FIANARANTSOA", c:"304", l:"Ambatofinandrahana"},
+  {f:"FIANARANTSOA", c:"305", l:"Ambohimahasoa"},
+  {f:"FIANARANTSOA", c:"306", l:"Ambositra"},
+  {f:"FIANARANTSOA", c:"307", l:"Befotaka"},
+  {f:"FIANARANTSOA", c:"309", l:"Farafangana"},
+  {f:"FIANARANTSOA", c:"310", l:"Ikongo"},
+  {f:"FIANARANTSOA", c:"312", l:"Ifanadiana"},
+  {f:"FIANARANTSOA", c:"313", l:"Ihosy"},
+  {f:"FIANARANTSOA", c:"314", l:"Ikalamavony"},
+  {f:"FIANARANTSOA", c:"315", l:"Ivohibe"},
+  {f:"FIANARANTSOA", c:"316", l:"Manakara"},
+  {f:"FIANARANTSOA", c:"317", l:"Mananjary"},
+  {f:"FIANARANTSOA", c:"318", l:"Midongy Sud"},
+  {f:"FIANARANTSOA", c:"319", l:"Nosy Varika"},
+  {f:"FIANARANTSOA", c:"320", l:"Vangaindrano"},
+  {f:"FIANARANTSOA", c:"321", l:"Vohipeno"},
+  {f:"FIANARANTSOA", c:"322", l:"Vondrozo"},
+  {f:"FIANARANTSOA", c:"323", l:"Manandriana"},
+  {f:"MAHAJANGA", c:"401", l:"Mahajanga"},
+  {f:"MAHAJANGA", c:"40101", l:"CU Mahajanga"},
+  {f:"MAHAJANGA", c:"402", l:"Mahajanga II"},
+  {f:"MAHAJANGA", c:"403", l:"Ambato Boeni"},
+  {f:"MAHAJANGA", c:"404", l:"Ambatomainty"},
+  {f:"MAHAJANGA", c:"405", l:"Analalava"},
+  {f:"MAHAJANGA", c:"406", l:"Antsalova"},
+  {f:"MAHAJANGA", c:"407", l:"Antsohihy"},
+  {f:"MAHAJANGA", c:"408", l:"Bealalana"},
+  {f:"MAHAJANGA", c:"409", l:"Befandriana Nord"},
+  {f:"MAHAJANGA", c:"410", l:"Besalampy"},
+  {f:"MAHAJANGA", c:"411", l:"Kandreho"},
+  {f:"MAHAJANGA", c:"412", l:"Maevatanana"},
+  {f:"MAHAJANGA", c:"413", l:"Maintirano"},
+  {f:"MAHAJANGA", c:"414", l:"Mampikony"},
+  {f:"MAHAJANGA", c:"415", l:"Mandritsara"},
+  {f:"MAHAJANGA", c:"416", l:"Marovoay"},
+  {f:"MAHAJANGA", c:"417", l:"Mitsinjo"},
+  {f:"MAHAJANGA", c:"418", l:"Morafenobe"},
+  {f:"MAHAJANGA", c:"419", l:"Boriziny (Port Bergé)"},
+  {f:"MAHAJANGA", c:"420", l:"Soalala"},
+  {f:"MAHAJANGA", c:"421", l:"Tsaratanana"},
+  {f:"TOAMASINA", c:"501", l:"Toamasina I"},
+  {f:"TOAMASINA", c:"50101", l:"CU Toamasina I"},
+  {f:"TOAMASINA", c:"502", l:"Toamasina II"},
+  {f:"TOAMASINA", c:"503", l:"Ambatondrazaka"},
+  {f:"TOAMASINA", c:"504", l:"Amparafaravola"},
+  {f:"TOAMASINA", c:"505", l:"Andilameno"},
+  {f:"TOAMASINA", c:"506", l:"Anosibe Anala"},
+  {f:"TOAMASINA", c:"507", l:"Antanambao Manampotsy"},
+  {f:"TOAMASINA", c:"508", l:"Vohibinany"},
+  {f:"TOAMASINA", c:"509", l:"Fenoarivo Antsinanana"},
+  {f:"TOAMASINA", c:"510", l:"Mahanoro"},
+  {f:"TOAMASINA", c:"511", l:"Mananara Avaratra"},
+  {f:"TOAMASINA", c:"512", l:"Maroantsetra"},
+  {f:"TOAMASINA", c:"513", l:"Marolambo"},
+  {f:"TOAMASINA", c:"514", l:"Moramanga"},
+  {f:"TOAMASINA", c:"515", l:"Nosy Boraha"},
+  {f:"TOAMASINA", c:"516", l:"Soanierana Ivongo"},
+  {f:"TOAMASINA", c:"517", l:"Vatomandry"},
+  {f:"TOAMASINA", c:"518", l:"Vavatenina"},
+  {f:"TOLIARY", c:"601", l:"Toliary I"},
+  {f:"TOLIARY", c:"60101", l:"CU Toliary I"},
+  {f:"TOLIARY", c:"602", l:"Toliary II"},
+  {f:"TOLIARY", c:"603", l:"Amboasary"},
+  {f:"TOLIARY", c:"604", l:"Ambovombe"},
+  {f:"TOLIARY", c:"605", l:"Amapanihy"},
+  {f:"TOLIARY", c:"606", l:"Ankazoabo"},
+  {f:"TOLIARY", c:"607", l:"Bekily"},
+  {f:"TOLIARY", c:"608", l:"Belo Sur Tsiribihina"},
+  {f:"TOLIARY", c:"609", l:"Beloha"},
+  {f:"TOLIARY", c:"610", l:"Benenitra"},
+  {f:"TOLIARY", c:"611", l:"Beroroha"},
+  {f:"TOLIARY", c:"612", l:"Betioky"},
+  {f:"TOLIARY", c:"613", l:"Betroka"},
+  {f:"TOLIARY", c:"614", l:"Taolanaro"},
+  {f:"TOLIARY", c:"615", l:"Mahabo"},
+  {f:"TOLIARY", c:"616", l:"Manja"},
+  {f:"TOLIARY", c:"617", l:"Miandrivazo"},
+  {f:"TOLIARY", c:"618", l:"Morombe"},
+  {f:"TOLIARY", c:"619", l:"Morondava"},
+  {f:"TOLIARY", c:"620", l:"Sakaraha"},
+  {f:"TOLIARY", c:"621", l:"Tsihombe"}
+];
+
+function norm(s){
+  return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+}
+function highlight(text, query){
+  if(!query) return text;
+  const idx = norm(text).indexOf(norm(query));
+  if(idx === -1) return text;
+  return String(text).slice(0,idx) + '<mark>' + String(text).slice(idx, idx+query.length) + '</mark>' + String(text).slice(idx+query.length);
+}
+
+/* ---- C9 : navigation interne (catégories -> liste -> grille) ---- */
+function c9ShowView(name){
+  document.querySelectorAll('#screen-c9 .gl-view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('c9-view-'+name).classList.add('active');
+}
+
+function c9RenderCatGrid(){
+  const grid = document.getElementById('c9-cat-grid');
+  grid.innerHTML = CATEGORIES.map(c=>`
+    <div class="menu-item" data-cat="${c.id}">
+      <div class="icon">${c.label.slice(0,2).toUpperCase()}</div>
+      <div class="txt"><b>${c.label}</b><span>${c.sub}</span></div>
+    </div>
+  `).join('');
+  grid.querySelectorAll('.menu-item').forEach(btn=>{
+    btn.addEventListener('click', ()=> c9OpenCategory(CATEGORIES.find(c=>c.id===btn.dataset.cat)));
+  });
+}
+
+let c9CurrentCat = null;
+function c9OpenCategory(cat){
+  c9CurrentCat = cat;
+  document.getElementById('c9-cat-title').textContent = cat.label;
+  document.getElementById('c9-cat-sub').textContent = cat.sub;
+  const grid = document.getElementById('c9-list-grid');
+  grid.innerHTML = cat.items.map(it=>`
+    <div class="menu-item" data-idx="${it.idx}">
+      <div class="icon">GI</div>
+      <div class="txt"><b>${it.label}</b><span>${GRILLES[it.idx].lignes.length} grades référencés</span></div>
+    </div>
+  `).join('');
+  grid.querySelectorAll('.menu-item').forEach(btn=>{
+    btn.addEventListener('click', ()=> c9OpenGrille(Number(btn.dataset.idx)));
+  });
+  c9ShowView('list');
+}
+
+let c9CurrentIdx = 0;
+let c9Meta = null;
+const c9Grade = document.getElementById('c9-grade');
+const c9CatCol = document.getElementById('c9-catcol');
+
+function c9BuildMeta(g){
+  const cols = g.colonnes;
+  const codeIdx = cols.findIndex(c => /^CODE GRADE$/i.test(c));
+  const anneeIdx = cols.findIndex(c => /ANNEE/i.test(c));
+  const valueCols = [];
+  cols.forEach((c,i)=>{ if(i===0 || i===codeIdx || i===anneeIdx) return; valueCols.push(i); });
+  return {codeIdx, anneeIdx, valueCols};
+}
+
+function c9OpenGrille(idx){
+  c9CurrentIdx = idx;
+  const g = GRILLES[idx];
+  c9Meta = c9BuildMeta(g);
+  document.getElementById('c9-grille-title').textContent = g.titre;
+  document.getElementById('c9-grille-ref').textContent = g.reference || '';
+
+  // Grade (ordre décroissant, comme la Grille Indiciaire standard)
+  c9Grade.innerHTML = g.lignes
+    .map((row,ri)=>({row,ri}))
+    .reverse()
+    .map(o=>{
+      const label = c9Meta.codeIdx !== -1 ? o.row[c9Meta.codeIdx] : o.row[0];
+      return `<option value="${o.ri}">${label}</option>`;
+    }).join('');
+
+  // Catégorie (seulement s'il y a plusieurs colonnes d'indice)
+  const wrap = document.getElementById('c9-catwrap');
+  if(c9Meta.valueCols.length > 1){
+    c9CatCol.innerHTML = c9Meta.valueCols.map(ci=>`<option value="${ci}">${g.colonnes[ci]}</option>`).join('');
+    wrap.style.display = 'block';
+  } else {
+    c9CatCol.innerHTML = '';
+    wrap.style.display = 'none';
+  }
+
+  c9Update();
+  c9ShowView('grille');
+}
+
+function c9Update(){
+  const g = GRILLES[c9CurrentIdx];
+  const row = g.lignes[Number(c9Grade.value)];
+  const colIdx = c9Meta.valueCols.length > 1 ? Number(c9CatCol.value) : c9Meta.valueCols[0];
+  const val = row[colIdx];
+  const gradeLabel = c9Meta.codeIdx !== -1 ? row[c9Meta.codeIdx] : row[0];
+
+  document.getElementById('c9-indice-val').textContent = (val === null || val === undefined) ? 'N/A' : val;
+  document.getElementById('c9-annee-req').textContent =
+    c9Meta.anneeIdx !== -1 ? `Année requise pour ${gradeLabel} : ${row[c9Meta.anneeIdx]} an(s)` : '';
+
+  const hint = document.getElementById('c9-grade-hint');
+  if(c9Meta.codeIdx !== -1){
+    hint.textContent = row[0];
+    hint.style.display = 'block';
+  } else {
+    hint.style.display = 'none';
+  }
+}
+
+c9Grade.addEventListener('change', c9Update);
+c9CatCol.addEventListener('change', c9Update);
+document.getElementById('c9-btn-back-cat').addEventListener('click', ()=> c9ShowView('cat'));
+document.getElementById('c9-btn-back-list').addEventListener('click', ()=>{
+  if(c9CurrentCat) c9OpenCategory(c9CurrentCat);
+  else c9ShowView('cat');
+});
+c9RenderCatGrid();
+
+/* ---- C10 : Code Localité ---- */
+const c10Q = document.getElementById('c10-q');
+const c10Clear = document.getElementById('c10-clear');
+const c10Far = document.getElementById('c10-faritany');
+const c10Hero = document.getElementById('c10-hero');
+
+[...new Set(LOCALITES.map(d=>d.f))].forEach(f=>{
+  const opt = document.createElement('option');
+  opt.value = f; opt.textContent = f.charAt(0)+f.slice(1).toLowerCase();
+  c10Far.appendChild(opt);
+});
+
+function c10Render(){
+  const q = c10Q.value.trim();
+  const farFilter = c10Far.value;
+  c10Clear.style.display = q ? 'inline' : 'none';
+
+  let list = LOCALITES;
+  if(farFilter) list = list.filter(d=> d.f === farFilter);
+  if(q){
+    const nq = norm(q);
+    list = list.filter(d=> norm(d.c).indexOf(nq) !== -1 || norm(d.l).indexOf(nq) !== -1);
+  }
+
+  if(q && list.length === 1){
+    const d = list[0];
+    c10Hero.style.display = 'block';
+    document.getElementById('c10-hero-far').textContent = d.f;
+    document.getElementById('c10-hero-loc').textContent = d.l;
+    document.getElementById('c10-hero-code').textContent = d.c;
+  } else {
+    c10Hero.style.display = 'none';
+  }
+
+  const countEl = document.getElementById('c10-count');
+  const resultsEl = document.getElementById('c10-results');
+
+  if(list.length === 0){
+    countEl.textContent = '';
+    resultsEl.innerHTML = `<div class="gl-empty">Aucun résultat pour « ${q} »</div>`;
+    return;
+  }
+  countEl.textContent = q || farFilter ? `${list.length} résultat${list.length>1?'s':''}` : `${list.length} localités au total`;
+
+  resultsEl.innerHTML = `
+    <div class="gl-scroll">
+      <table>
+        <thead><tr><th>Code</th><th>Localité</th><th>Région</th></tr></thead>
+        <tbody>
+          ${list.map(d=>`
+            <tr>
+              <td class="gl-grade">${highlight(d.c, q)}</td>
+              <td>${highlight(d.l, q)}</td>
+              <td>${d.f}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+c10Q.addEventListener('input', c10Render);
+c10Far.addEventListener('change', c10Render);
+c10Clear.addEventListener('click', ()=>{ c10Q.value=''; c10Q.focus(); c10Render(); });
+c10Render();
+
+})();
+
+// ================= ENREGISTREMENT SERVICE WORKER (PWA hors-ligne) =================
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js').catch(() => {});
+  });
+}
+</script>
+
+</body>
+</html>
