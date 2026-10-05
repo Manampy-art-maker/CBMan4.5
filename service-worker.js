@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sp-outils-v5';
+const CACHE_NAME = 'sp-outils-v7';
 const FILES_TO_CACHE = [
   './index.html',
   './manifest.json',

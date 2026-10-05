@@ -1030,10 +1030,16 @@ function setupBonifTypeSelect(selectId, moisId, joursId){
         throw new Error("format");
       }
 
-      const hasAC = d2 >= d1;
+      const av = avancementYears;
+      // "Nouvelle date d'effet" = date normale du prochain avancement (dernière situation + durée d'échelon)
+      const dateNouvelle = replaceYear(d1, d1.getFullYear() + av);
+
+      let hasAC, acRaison;
+      if(d2 < d1){ hasAC = false; acRaison = "bonification antérieure à la date dernière situation"; }
+      else if(d2 > dateNouvelle){ hasAC = false; acRaison = "bonification postérieure à la nouvelle date d'effet"; }
+      else { hasAC = true; acRaison = ""; }
       const [acA, acM, acJ] = hasAC ? diff30_360(d1, d2) : [0,0,0];
       const total = acA*360 + acM*30 + acJ + mois*30 + jours;
-      const av = avancementYears;
       const isACMode = document.getElementById('c3-bonif-type').value === 'ac_civile';
       let txt, dateEffet, statusClass;
 
@@ -1049,8 +1055,7 @@ function setupBonifTypeSelect(selectId, moisId, joursId){
         dateEffet = d2;
       } else {
         statusClass = 'epuise';
-        const dateNormale = replaceYear(d1, d1.getFullYear() + av);
-        dateEffet = soustraction30j(dateNormale, mois, jours);
+        dateEffet = soustraction30j(dateNouvelle, mois, jours);
         txt = isACMode
           ? `<span class="status-epuise">AC épuisé</span>`
           : `<span class="status-epuise">BACons épuisé</span>`;
@@ -1061,7 +1066,7 @@ function setupBonifTypeSelect(selectId, moisId, joursId){
       resultEl.innerHTML =
         (hasAC ? `<span class="section-title">AC</span>${acA}a ${acM}m ${acJ}j` +
         (isACMode ? '' : `<span class="section-title second">Total Conserver</span>${pyFloorDiv(total,360)}a ${pyFloorDiv(pyMod(total,360),30)}m ${pyMod(total,30)}j`)
-        : `<span class="section-title">AC</span>Aucune (bonification antérieure à la date dernière situation)`) +
+        : `<span class="section-title">AC</span>Aucune (${acRaison})`) +
         `<span class="section-title second"></span>${txt}` +
         `<span class="section-title second">Date effet</span>${formatDate(dateEffet)}`;
     } catch(e){
